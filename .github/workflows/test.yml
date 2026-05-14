@@ -15,12 +15,12 @@ jobs:
 
     steps:
       - name: Check out MLM
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: mlm
 
       - name: Check out Genelet
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: guruperl/perl
           path: perl
