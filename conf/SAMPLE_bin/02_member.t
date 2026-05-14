@@ -88,5 +88,31 @@ for (my $i=1; $i<10; $i++) {
   }
 }
 
+my $resp = $admin->get_mockup("member", "action=resetpass&memberid=1111&newpasswd=abc12345&confirm=abc12345");
+is($resp->code, 200, "GET resetpass returns JSON error response");
+my $content = JSON->new->utf8(0)->decode( $resp->content() );
+ok($content->{error} == 1038 || $content->{error} == 1046, "GET resetpass is rejected");
+
+$resp = $admin->post_mockup("member", [
+  "action"=>"resetpass",
+  "memberid"=>"1111",
+  "newpasswd"=>"abc12345",
+  "confirm"=>"abc12345",
+  "csrf"=>"bad-token"
+]);
+is($resp->code, 200, "POST resetpass with bad CSRF returns JSON error response");
+$content = JSON->new->utf8(0)->decode( $resp->content() );
+is($content->{error}, 1047, "POST resetpass with bad CSRF is rejected");
+
+$resp = $admin->post_mockup("member", [
+  "action"=>"resetpass",
+  "memberid"=>"1111",
+  "newpasswd"=>"abc12345",
+  "confirm"=>"abc12345"
+]);
+is($resp->code, 200, "POST resetpass with CSRF succeeds");
+$content = JSON->new->utf8(0)->decode( $resp->content() );
+ok($content->{success}, "resetpass response is successful");
+
 done_testing();
 exit(0);

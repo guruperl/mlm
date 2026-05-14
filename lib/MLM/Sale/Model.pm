@@ -52,15 +52,13 @@ sub buy {
     $d1 = $need;
   }
 
-  $self->{DBH}->begin_work;
-
-  eval {
+  $err = $self->run_in_transaction(sub {
     $err = $self->do_sql(
       "INSERT INTO sale (memberid, amount, credit, shipping, paytype, paystatus, typeid, active, created)
        VALUES (?, ?, ?, ?, 'Advanced', 'Processing', ?, 'Yes', NOW())",
       $ARGS->{memberid}, $ARGS->{amount}, $ARGS->{credit}, $ARGS->{shipping}, $ARGS->{shop_typeid}
     );
-    die $err if $err;
+    return $err if $err;
 
     my $saleid = $self->last_insertid();
     my @basket_items = @{$self->{OTHER}->{basket_topics}};
@@ -71,14 +69,14 @@ sub buy {
                  join(',', ("(?, ?, ?, ?)") x @basket_items);
       my @params1 = map { ($saleid, $_->{basketid}, $_->{amount} + $_->{shipping}, $_->{credit}) } @basket_items;
       $err = $self->do_sql($str1, @params1);
-      die $err if $err;
+      return $err if $err;
 
       # Parameterized update for sale_basket
       my $str2 = "UPDATE sale_basket SET inbasket='No' WHERE memberid=? AND basketid IN (" .
                  join(',', ("?") x @basket_items) . ")";
       my @params2 = ($ARGS->{memberid}, map { $_->{basketid} } @basket_items);
       $err = $self->do_sql($str2, @params2);
-      die $err if $err;
+      return $err if $err;
     }
 
     $err = $self->do_sql(
@@ -86,16 +84,10 @@ sub buy {
        VALUES (?,?,?,?,?,?,NOW(),'Shopping')",
       $ARGS->{memberid}, -1*$need, $ledger->{balance}-$d2, $ledger->{shop_balance}-$d1, $ledger->{ledgerid}, $ledger->{weekid}
     );
-    die $err if $err;
-
-    $self->{DBH}->commit;
-  };
-
-  if ($@) {
-    my $reason = $@;
-    $self->{DBH}->rollback;
-    return $reason;
-  }
+    return $err if $err;
+    return;
+  });
+  return $err if $err;
 
   return;
 }

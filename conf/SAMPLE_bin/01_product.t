@@ -11,6 +11,20 @@ my $admin = MLM::Beacon->new(role=>"a");
 my $err = $admin->get_credential("gmarket","gmarketIsCool");
 die $err if $err;
 
+my $resp = $admin->get_mockup("category", "action=delete&categoryid=1");
+is($resp->code, 200, "GET delete returns JSON error response");
+my $content = JSON->new->utf8(0)->decode( $resp->content() );
+is($content->{error}, 1038, "GET delete is rejected");
+
+$resp = $admin->post_mockup("category", [
+	"action"=>"delete",
+	"categoryid"=>1,
+	"csrf"=>"bad-token"
+]);
+is($resp->code, 200, "POST delete with bad CSRF returns JSON error response");
+$content = JSON->new->utf8(0)->decode( $resp->content() );
+is($content->{error}, 1047, "POST delete with bad CSRF is rejected");
+
 my @all = (
 	["category", [ "action"=>"insert", "categoryid"=>1, "title"=>"Test Cat One", "description"=>"Category for test, description number one."]],
 	["gallery", [ "action"=>"insert", "categoryid"=>1, "title"=>"Test item One", "description"=>"Product item for test, description number one.", "price"=>200, "bv"=>200, "sh"=>20]],
@@ -29,9 +43,9 @@ my @all = (
 );
 
 for my $item (@all) {
-	my $resp = $admin->post_mockup($item->[0], $item->[1]);
+	$resp = $admin->post_mockup($item->[0], $item->[1]);
 	is($resp->code, 200, "status code 200");
-	my $content = JSON->new->utf8(0)->decode( $resp->content() );
+	$content = JSON->new->utf8(0)->decode( $resp->content() );
 	die "Incorrect json return" unless ($content and $content->{data});
 }
 

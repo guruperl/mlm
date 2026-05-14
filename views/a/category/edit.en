@@ -6,18 +6,19 @@
 <form class="form" action=category method=post>
 <input type=hidden name=categoryid value="[% item.categoryid %]" />
 <input type=hidden name=action value="update" />
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
      <div class="row">
         <div class="col-md-12 order-md-1">
             <div class="row">
               <div class="col-md-4 mb-3">
                 <label for="title">Title</label>
-                <input type="text" class="form-control" id="title" name="title" value='[% item.title %]'>
+                <input type="text" class="form-control" id="title" name="title" value='[% item.title | html %]'>
               </div>
             </div>
             <div class="row">
               <div class="col-md-4 mb-3">
                 <label for="description">Description</label>
-                <textarea class="form-control" rows=4>[% item.description %]</textarea>
+                <textarea class="form-control" rows=4 name=description>[% item.description | html %]</textarea>
               </div>
             </div>
             <div class="row">

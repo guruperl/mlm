@@ -1,6 +1,6 @@
 [% INCLUDE start.en %]
 
-<form class="form-inline" name=f0 action=income method=post>
+<form class="form-inline" name=f0 action=income method=get>
 <div class="row">
 	<div class="col-sm-2">Search:</div>
 	<div class="col-sm-3">
@@ -10,7 +10,7 @@
 		</select>
 	</div>
 	<div class="col-sm-3">
-<input class="form-control" type=text name=v value="[% v %]">
+<input class="form-control" type=text name=v value="[% v | html %]">
 	</div>
 	<div class="col-sm-2">
 <select class="form-control" name=classify>
@@ -29,7 +29,7 @@
 <p> </p>
 
     <div class="row">
-        <div class="col-sm-5"><h4>Compensation: [% classify %]</h4></div>
+        <div class="col-sm-5"><h4>Compensation: [% classify | html %]</h4></div>
         <div class="col-sm-7 text-right">[% SET from = ( pageno - 1 ) * rowcount + 1 %][% SET to = pageno * rowcount %]
 Between [% from %] and [% to %] among total [% totalno %].
 Page: [% SET i=1 %][% WHILE (i <= maxpageno) %]

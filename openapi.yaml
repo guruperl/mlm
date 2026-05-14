@@ -4,6 +4,8 @@ info:
   description: |
     Multi-Level Marketing (MLM) REST API built on the Genelet framework.
     All endpoints follow the pattern: `/cgi-bin/goto/{ROLE}/json/{COMPONENT}?action={ACTION}&{OTHER}`
+    Authenticated mutating POST requests must include the latest `relationships.csrf`
+    token from a prior authenticated JSON response as the form field `csrf`.
   version: 1.0.0
 servers:
   - url: /cgi-bin/goto
@@ -88,7 +90,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [startnew, startdef, changepass, dashboard, edit]
+            enum: [startnew, startdef, dashboard, edit]
       responses:
         '200':
           description: OK
@@ -101,12 +103,14 @@ paths:
           required: true
           schema:
             type: string
-            enum: [update, changedef]
+            enum: [update, changedef, changepass]
       requestBody:
         content:
           application/x-www-form-urlencoded:
             schema:
               type: object
+              properties:
+                csrf: {type: string}
       responses:
         '200':
           description: OK
@@ -145,6 +149,7 @@ paths:
                 classify: {type: string}
                 id: {type: integer}
                 qty: {type: integer}
+                csrf: {type: string}
       responses:
         '200':
           description: OK
@@ -234,7 +239,28 @@ paths:
           required: true
           schema:
             type: string
-            enum: [topics, startnew, buy, edit, myInvoice]
+            enum: [topics, startnew, edit, myInvoice]
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [Member, Sales]
+      summary: Member Sale Modifications
+      parameters:
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [buy]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                agreebalance: {type: string}
+                csrf: {type: string}
       responses:
         '200':
           description: OK
@@ -264,7 +290,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [startnew, topics, reply, edit]
+            enum: [startnew, topics, edit]
       responses:
         '200':
           description: OK
@@ -277,7 +303,17 @@ paths:
           required: true
           schema:
             type: string
-            enum: [insert, update]
+            enum: [insert, update, reply]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                subjectid: {type: integer}
+                description: {type: string}
+                status: {type: string}
+                csrf: {type: string}
       responses:
         '200':
           description: OK
@@ -309,6 +345,13 @@ paths:
           schema:
             type: string
             enum: [insert, delete]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                csrf: {type: string}
       responses:
         '200':
           description: OK
@@ -323,7 +366,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [topics, bulk, enter, edit]
+            enum: [topics, enter, edit]
         - name: u
           in: query
           description: Search field
@@ -344,7 +387,14 @@ paths:
           required: true
           schema:
             type: string
-            enum: [insert, update, delete, resetpass]
+            enum: [insert, update, delete, resetpass, bulk]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                csrf: {type: string}
       responses:
         '200':
           description: OK
@@ -373,12 +423,32 @@ paths:
           schema:
             type: string
             enum: [delete, update]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                csrf: {type: string}
       responses:
         '200':
           description: OK
 
   /a/json/income:
     get:
+      tags: [Admin, Income]
+      summary: Admin Income Topics
+      parameters:
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [topics, starttest]
+      responses:
+        '200':
+          description: OK
+    post:
       tags: [Admin, Income]
       summary: Admin Income Operations
       parameters:
@@ -387,7 +457,14 @@ paths:
           required: true
           schema:
             type: string
-            enum: [topics, starttest, week4_direct, week1_binary, week1_match, week1_affiliate, run_to_yesterday, run_daily, run_all_tests]
+            enum: [week4_direct, week1_binary, week1_match, week1_affiliate, run_to_yesterday, run_daily, run_all_tests]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                csrf: {type: string}
       responses:
         '200':
           description: OK
@@ -416,6 +493,13 @@ paths:
           schema:
             type: string
             enum: [makeIncome, addShopping, insert, delete, update]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                csrf: {type: string}
       responses:
         '200':
           description: OK
@@ -444,6 +528,13 @@ paths:
           schema:
             type: string
             enum: [insert, update]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                csrf: {type: string}
       responses:
         '200':
           description: OK
@@ -458,7 +549,27 @@ paths:
           required: true
           schema:
             type: string
-            enum: [startnew, topics, leave_tree, join_tree]
+            enum: [startnew, topics]
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [Admin, Placement]
+      summary: Admin Placement Operations
+      parameters:
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [leave_tree, join_tree]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                csrf: {type: string}
       responses:
         '200':
           description: OK
@@ -487,6 +598,13 @@ paths:
           schema:
             type: string
             enum: [insert, delete, update]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                csrf: {type: string}
       responses:
         '200':
           description: OK
@@ -515,6 +633,13 @@ paths:
           schema:
             type: string
             enum: [insert, delete, update]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                csrf: {type: string}
       responses:
         '200':
           description: OK
@@ -543,6 +668,48 @@ paths:
           schema:
             type: string
             enum: [insert, delete, update]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                csrf: {type: string}
+      responses:
+        '200':
+          description: OK
+
+  /a/json/packagedetail:
+    get:
+      tags: [Admin, Products]
+      summary: Admin Package Detail Topics
+      parameters:
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [topics]
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [Admin, Products]
+      summary: Admin Package Detail Modifications
+      parameters:
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [insert, delete, update]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                csrf: {type: string}
       responses:
         '200':
           description: OK
@@ -601,6 +768,13 @@ paths:
           schema:
             type: string
             enum: [insert, delete]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                csrf: {type: string}
       responses:
         '200':
           description: OK

@@ -3,3 +3,12 @@ It's time to build your business compensation plans, and add one backend admin u
 The included 03_setup.sql is good enough for the tests. After successfully running through all tests, i.e. in 07_read.me, you will be instructed to go to production.
 
 So the next step is to load 03_setup.sql into the database using a MySQL client tool.
+
+For tests you can either use Docker MySQL:
+
+$ make mysql-up
+$ make mysql-reset
+
+or your own MySQL instance:
+
+$ make mysql-reset-external MYSQL_HOST=127.0.0.1 MYSQL_PORT=3306 MYSQL_DATABASE=mlm_test MYSQL_USER=mlm MYSQL_PASSWORD=mlm

@@ -1,23 +1,22 @@
 It's time to run functional tests.
 
-1) make a new directory named "bin" under "mlm":
-$ mkdir ../bin
-2) copy all files under "SAMPLE_bin" to "bin":
-$ cp SAMPLE_bin/* ../bin
-3) go to "bin":
-$ cd ../bin
-4) edit the files. Replace "SAMPLE_home" by your real one.
-5) directory "SAMPLE_home/mlm/logs" saves debug messages. If it does not exist, you need to create it
-$ mkdir ../logs
-6) run 01_product.t to add some products:
-$ perl 01_product.t
-7) run 02_member.t to add some members:
-$ perl 02_member.t
-8) run 03_income.t to inspect if compensation calculations are correct:
-$ perl 03_income.t
-9) run 04_ledger.t to write the compensations to ledger book:
-$ perl 04_ledger.t
-10) run 05_shopping.t to make a shopping process:
-$ perl 05_shopping.t
+The functional tests are runnable in place; they no longer need to be copied into bin or edited for SAMPLE_home paths. Use the repo-owned Docker MySQL database:
 
-Make sure all the tests pass.
+$ make mysql-up
+$ make mysql-reset
+$ make functional-test
+
+To use your own MySQL instance instead of Docker, create an empty test database and run:
+
+$ make mysql-reset-external MYSQL_HOST=127.0.0.1 MYSQL_PORT=3306 MYSQL_DATABASE=mlm_test MYSQL_USER=mlm MYSQL_PASSWORD=mlm
+$ make functional-test MYSQL_HOST=127.0.0.1 MYSQL_PORT=3306 MYSQL_DATABASE=mlm_test MYSQL_USER=mlm MYSQL_PASSWORD=mlm
+
+The files run in this order:
+
+1) conf/SAMPLE_bin/01_product.t adds products and packages.
+2) conf/SAMPLE_bin/02_member.t adds and activates members.
+3) conf/SAMPLE_bin/03_income.t checks compensation calculations.
+4) conf/SAMPLE_bin/04_ledger.t writes compensation to the ledger.
+5) conf/SAMPLE_bin/05_shopping.t checks a retail shopping flow.
+
+Use make test when you want compile checks, JSON validation, database reset, and the full functional sequence in one command.

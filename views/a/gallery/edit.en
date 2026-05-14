@@ -1,18 +1,19 @@
 [% INCLUDE start.en %]
 [% SET item=edit.0 %]
 
-<h4>Item [% item.title %]</h4>
+<h4>Item [% item.title | html %]</h4>
 
 <form name=form[% item.galleryid %] action=gallery method=post enctype="multipart/form-data">
 <input type=hidden name='action' value='update'>
 <input type=hidden name='galleryid' value='[% item.galleryid %]'>
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
 
      <div class="row">
         <div class="col-md-12 order-md-1">
             <div class="row">
               <div class="col-md-4 mb-3">
                 <label for="title">Category</label>
-				<select name='categoryid' class="form-control">[% FOREACH single=category_topics %]<option [% IF item.categoryid==single.categoryid %]selected[% END %] value="[% single.categoryid %]">[% single.title %]</option>[% END %]</select>
+				<select name='categoryid' class="form-control">[% FOREACH single=category_topics %]<option [% IF item.categoryid==single.categoryid %]selected[% END %] value="[% single.categoryid %]">[% single.title | html %]</option>[% END %]</select>
               </div>
 
               <div class="col-md-4 mb-3">
@@ -35,7 +36,7 @@
 			<div class="row">
               <div class="col-md-4 mb-3">
                 <label for="title">Product Name</label>
-                <input type="text" class="form-control" id="title" name="title" value="[% item.title %]" required>
+                <input type="text" class="form-control" id="title" name="title" value="[% item.title | html %]" required>
                 <div class="invalid-feedback">
                   Valid title is required.
                 </div>
@@ -58,18 +59,18 @@
 
             <div class="row">
               <div class="col-md-4 mb-3">
-                <label for="logoupload">Thumbnail [% IF item.logo %]<a href='[% item.logo %]'><img border=0 width=100 src='[% item.logo %]' border=0></a>[% END %]:</label>
+                <label for="logoupload">Thumbnail [% IF item.logo %]<a href='[% item.logo | html %]'><img border=0 width=100 src='[% item.logo | html %]' border=0></a>[% END %]:</label>
                 <input type="file" class="form-control-file" id="logoupload" name="logoupload">
               </div>
 
               <div class="col-md-4 mb-3">
-                <label for="fullupload">Full Logo [% IF item.full %]<a href='[% item.full %]'><img border=0 width=100 src='[% item.full %]' border=0></a>[% END %]:</label>
-                <input type="file" class="form-control-file" id="fullupload" name="logoupload">
+                <label for="fullupload">Full Logo [% IF item.full %]<a href='[% item.full | html %]'><img border=0 width=100 src='[% item.full | html %]' border=0></a>[% END %]:</label>
+                <input type="file" class="form-control-file" id="fullupload" name="fullupload">
               </div>
 
               <div class="col-md-4 mb-3">
                 <label for="description">Description</label>
-                <textarea class="form-control" rows=4>[% item.description %]</textarea>
+                <textarea class="form-control" rows=4 name=description>[% item.description | html %]</textarea>
               </div>
             </div>
 

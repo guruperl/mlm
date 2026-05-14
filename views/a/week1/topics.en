@@ -1,5 +1,10 @@
 [% INCLUDE start.en %]
-To calculate all rewards up to yesterday: <a class="btn btn-sm btn-danger" onclick="return confirm('Are you sure to run?\nThis operation cannot be reversed.')" href="income?action=run_to_yesterday">Emergency Run</a>
+To calculate all rewards up to yesterday:
+<form action=income method=post style="display:inline" onsubmit="return confirm('Are you sure to run?\nThis operation cannot be reversed.')">
+<input type=hidden name=action value=run_to_yesterday>
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
+<button class="btn btn-sm btn-danger" type=submit>Emergency Run</button>
+</form>
 
 <p> </p>
 

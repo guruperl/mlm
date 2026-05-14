@@ -16,10 +16,10 @@
 <tbody>[% FOREACH item=topics %]
 <tr>
 <td><a href="tt?action=edit&subjectid=[% item.subjectid %]">[% item.subjectid %]</a></td>
-<td>[% item.title %]</td>
-<td>[% item.category %]</td>
-<td>[% item.status %]</td>
-<td>[% item.created %]</td>
+<td>[% item.title | html %]</td>
+<td>[% item.category | html %]</td>
+<td>[% item.status | html %]</td>
+<td>[% item.created | html %]</td>
 </tr>
 [% END %]</tbody>
 </table>
@@ -29,6 +29,7 @@
 
 <form class="form" action=tt method=post>
 <input type=hidden name=action value='insert'>
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
 <div class=row>
 	<div class="col-2">Nickname:</div>
 	<div class="col-4"><input class="form-control" type=text name='name'></div>

@@ -79,6 +79,63 @@ sub test_filter_security_helpers : Test(4) {
     can_ok('MLM::Income::Filter', 'build_like_sql');
 }
 
+sub test_run_to_yesterday_clears_stale_flags : Test(4) {
+    my $self = shift;
+
+    my $model = bless {
+        ARGS => {},
+        seen => [],
+    }, 'IncomeRunToYesterdayTest';
+
+    my $err = $model->run_to_yesterday();
+    is($err, undef, 'run_to_yesterday succeeds');
+    is(scalar @{$model->{seen}}, 2, 'two pending periods were processed');
+    is($model->{seen}->[0]->{to_run_binary}, 1, 'first period runs binary');
+    ok(!$model->{seen}->[1]->{to_run_binary} && $model->{seen}->[1]->{to_run_match},
+        'second period does not inherit stale binary flag');
+}
+
+package IncomeRunToYesterdayTest;
+
+use parent 'MLM::Income::Model';
+
+sub select_sql {
+    my ($self, $arr) = @_;
+    push @$arr,
+        {
+            c1_id => 10,
+            daily => '2024-01-08',
+            start_daily => '2024-01-01',
+            end_daily => '2024-01-07',
+            statusBinary => 'No',
+            statusUp => 'Yes',
+            statusAffiliate => 'Yes',
+            status => 'Yes',
+        },
+        {
+            c1_id => 11,
+            daily => '2024-01-15',
+            start_daily => '2024-01-08',
+            end_daily => '2024-01-14',
+            statusBinary => 'Yes',
+            statusUp => 'No',
+            statusAffiliate => 'Yes',
+            status => 'Yes',
+        };
+    return;
+}
+
+sub call_once { return }
+
+sub run_cron {
+    my $self = shift;
+    push @{$self->{seen}}, {
+        map { $_ => $self->{ARGS}->{$_} }
+        qw(c1_id c4_id to_run_direct to_run_binary to_run_match to_run_affiliate)
+    };
+    return;
+}
+
 package main;
 
 Test::Class->runtests;

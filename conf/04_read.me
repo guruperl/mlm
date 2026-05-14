@@ -4,11 +4,13 @@ At this step, we make configuration file named "config.json".
 $ cp SAMPLE_config.json config.json
 
 2) edit config.json to make sure
-2.1) replace SAMPLE_homme to your top directory hosting "mlm" and "perl"
+2.1) replace SAMPLE_home to your top directory hosting "mlm" and "perl"
 2.2) replace SAMPLE_domain by your real domain name (or sub-domain name)
 2.3) choose random security codes. A typical string is about 80 chars.
 2.4) replace the sample MySQL access parameters to real ones.
+     The Db array format is:
+     ["dbi:mysql:database=DBNAME;host=HOST;port=PORT", "USER", "PASSWORD"]
 
-3) optionally, your may include "perl" and "mlm/lib" into your shell by
+3) optionally, you may include "perl" and "mlm/lib" in your shell by
 $ export PERL5LIB=/SAMPLE_home/perl:/SAMPLE_home/mlm/lib
 (replace SAMPLE_home by the real one)

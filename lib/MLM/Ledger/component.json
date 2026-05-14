@@ -1,7 +1,7 @@
 {
 	"actions" : {
 		"topics"  :{"groups":["m"]},
-		"makeIncome":{},
+		"makeIncome":{"method":["POST"],"options":["csrf"]},
 		"addShopping":{"validate":["remark"], "method":["POST"], "options":["csrf"]},
 		"insert"  :{"validate":["memberid","weekid","amount","balance"]},
 		"delete"  :{"validate":["ledgerid"]},

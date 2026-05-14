@@ -17,10 +17,16 @@
 <tbody>[% FOREACH item=topics %]
 <tr>
 <td>[% IF (item.classify=='package') %]Package[% ELSE %]Item[% END %]</td>
-<td>[% item.title %]</td>
+<td>[% item.title | html %]</td>
 <td>$[% item.price %]</td>
 <form name=basket[% item.basketid %] class="form-inline" action=basket method="post"><input type=hidden name="action" value="update">[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]<input type=hidden name="basketid" value=[% item.basketid %]>
-<td><input type=text class="form-control-inline col-2" name="qty" value="[% item.qty %]"><button type=submit class="btn btn-sm btn-primary">Upd</button> <a class="btn btn-sm btn-info" href="basket?action=delete&basketid=[% item.basketid %]">Remove</a></td></form>
+<td><input type=text class="form-control-inline col-2" name="qty" value="[% item.qty %]"><button type=submit class="btn btn-sm btn-primary">Upd</button></form>
+<form action=basket method=post style="display:inline">
+<input type=hidden name=action value=delete>
+<input type=hidden name=basketid value="[% item.basketid %]">
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
+<button type=submit class="btn btn-sm btn-info">Remove</button>
+</form></td>
 <td align=right>$[% item.shipping %]</td>
 <td align=right>$[% item.amount %]</td>
 </tr>

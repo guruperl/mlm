@@ -1,6 +1,6 @@
 [% INCLUDE start.en %]
 
-<form class="form-inline" name=f0 action=ledger method=post>
+<form class="form-inline" name=f0 action=ledger method=get>
 <div class="row">
     <div class="col-sm-2">Search:</div>
     <div class="col-sm-3">
@@ -10,7 +10,7 @@
         </select>
     </div>
     <div class="col-sm-3">
-<input class="form-control" type=text name=v value="[% v %]">
+<input class="form-control" type=text name=v value="[% v | html %]">
     </div>
     <div class="col-sm-2">
 <select class="form-control" name=status>
@@ -33,7 +33,7 @@
 <p> </p>
 
     <div class="row">
-        <div class="col-sm-5"><h4>Ledger: [% status %]</h4></div>
+        <div class="col-sm-5"><h4>Ledger: [% status | html %]</h4></div>
         <div class="col-sm-7 text-right">[% SET from = ( pageno - 1 ) * rowcount + 1 %][% SET to = pageno * rowcount %]
 Between [% from %] and [% to %] among total [% totalno %].
 Page: [% SET i=1 %][% WHILE (i <= maxpageno) %]
@@ -69,8 +69,8 @@ Page: [% SET i=1 %][% WHILE (i <= maxpageno) %]
 <td>[% item.shop_balance %]</td>
 <td>[% item.created %]</td>
 [% IF (status=='Cancel') %]<td>[% item.remark %]</td>
-[% ELSIF (status=='Delivered') %]<td><button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#ledgerModal[% item.ledgerid %]">Cancel</button></td>
-[% ELSIF (status=='Weekly' || status=='Monthly') %]<td><button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#ledgerModal[% item.ledgerid %]">Mark Paid</button></td>[% END %]
+[% ELSIF (status=='Delivered') %]<td><button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#ledgerDeliverModal[% item.ledgerid %]">Cancel</button></td>
+[% ELSIF (status=='Weekly' || status=='Monthly') %]<td><button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#ledgerDeliverModal[% item.ledgerid %]">Mark Paid</button></td>[% END %]
 </tr>
 [% END %]</tbody>
 </table>
@@ -90,10 +90,12 @@ Page: [% SET i=1 %][% WHILE (i <= maxpageno) %]
 		<h6>[% IF status=='Delivered' %]Cancel[% ELSE %]Mark[% END %] payment for #[% item.ledgerid %]</h6>
 		<div classs=row>
 		  <div class=col-2>Remark:</div>
-		  <div class=col-10><input type=text class="form-control" name=remark [% IF status=='Delivered' %]value="[% item.remark %]"[% ELSE %]placeholder="remarks for payment"[% END %]></div>
+		  <div class=col-10><input type=text class="form-control" name=remark [% IF status=='Delivered' %]value="[% item.remark | html %]"[% ELSE %]placeholder="remarks for payment"[% END %]></div>
 		</div>
 		<input type=hidden name=status value=[% IF status=='Delivered' %]Cancel[% ELSE %]Delivered[% END %]>
 		<input type=hidden name=action value=update>
+		<input type=hidden name=ledgerid value="[% item.ledgerid %]">
+		[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
 	  </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -106,6 +108,7 @@ Page: [% SET i=1 %][% WHILE (i <= maxpageno) %]
 <h4>Dollar amount added offline to ledger for shoppings</h4>
 <form class="form" name=formoffline action=ledger method=post>
 <input type=hidden name=action value="addShopping">
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
      <div class="row">
         <div class="col-md-12 order-md-1">
             <div class="row">
@@ -127,7 +130,7 @@ Page: [% SET i=1 %][% WHILE (i <= maxpageno) %]
             <div class="row">
               <div class="col-md-4 mb-3">
                 <label for="description">Remark</label>
-                <textarea class="form-control" rows=4 placeholder="Remarks"></textarea>
+                <textarea class="form-control" rows=4 name=remark placeholder="Remarks"></textarea>
               </div>
             </div>
             <div class="row">

@@ -5,6 +5,7 @@
 <form name=f1 method=post action=package>
 <input type=hidden name=action value=update>
 <input type=hidden name=packageid value=[% packageid %]>
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
 
     <div class="table-responsive">
         <table class="table table-striped">
@@ -21,12 +22,17 @@
 </thead><tbody>[% FOREACH item=topics %]
 <tr>
 <td>[% item.galleryid %]</td>
-<td>[% item.title %]</td>
+<td>[% item.title | html %]</td>
 <td>[% item.price %]</td>
 <td>[% item.bv %]</td>
 <td>[% item.sh %]</td>
 <td>[% item.num %]</td>
-<td><a class="btn btn-sm btn-danger" href="packagedetail?action=delete&ids=[% item.id %]">DEL</a></td>
+<td><form method=post action=packagedetail style="display:inline">
+<input type=hidden name=action value=delete>
+<input type=hidden name=ids value="[% item.id %]">
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
+<button class="btn btn-sm btn-danger" type=submit>DEL</button>
+</form></td>
 </tr>
 [% END %]<tr>
 <td colspan=2>Total:</td>
@@ -45,12 +51,13 @@
 <form name=f2 method=post action=packagedetail>
 <input type=hidden name=action value=insert>
 <input type=hidden name=packageid value=[% packageid %]>
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
      <div class="row">
         <div class="col-md-12 order-md-1">
             <div class="row">
               <div class="col-md-4 mb-3">
                 <label for="galleryid">Product:</label>
-                <select class="form-control" id="galleryid" name="galleryid">[% FOREACH g=gs %]<option value="[% g.galleryid %]">[% g.title %]</option>
+                <select class="form-control" id="galleryid" name="galleryid">[% FOREACH g=gs %]<option value="[% g.galleryid %]">[% g.title | html %]</option>
 				[% END %]</select>
               </div>
               <div class="col-md-4 mb-3">

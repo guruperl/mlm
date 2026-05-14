@@ -55,6 +55,10 @@ ORDER BY c1_id");
   for my $item (@$arr) {
     $err = $self->call_once({model=>"member", action=>"bulk"}, {upto=>$item->{end_daily}});
     return $err if $err;
+    delete @{$ARGS}{qw(
+      c1_id c4_id start_monthly start_daily end_daily
+      to_run_direct to_run_binary to_run_match to_run_affiliate
+    )};
     $ARGS->{start_monthly} = $item->{start_monthly};
     $ARGS->{start_daily} = $item->{start_daily};
     $ARGS->{end_daily} = $item->{end_daily};

@@ -1,23 +1,14 @@
-It's time to run unit tests.
+It's time to run compile checks and the test suite.
 
-Under directory "SAMPLE_MLM":
-1) copy file "Beancon.pm" to "mlm/lib/MLM"
-2) copy file "admin.t" to "mlm/lib/MLM/Admin"
-3) copy file "placement.t" to "mlm/lib/MLM/Placement"
+For the current repo-local test harness, start the Docker MySQL service and run:
 
-So the directory structure for the three new files looks like
+$ make mysql-up
+$ make test
 
-mlm/lib/MLM
-           /Beacon.pm
-           /Admin
-                 /admin.t
-           /Placement
-                 /placement.t
+If you prefer to use your own MySQL instance, create an empty test database and run:
 
-4) edit the files so "SAMPLE_home" points to the current top directory.
-5) go to "mlm/lib/MLM/Admin" and run
-$ perl admin.t
-to make sure the unit tests pass
-6) go to "mlm/lib/MLM/Placement" and run
-$ perl placement.t
-to make sure the unit tests pass
+$ make test-external MYSQL_HOST=127.0.0.1 MYSQL_PORT=3306 MYSQL_DATABASE=mlm_test MYSQL_USER=mlm MYSQL_PASSWORD=mlm
+
+The test targets compile MLM and Genelet modules, validate component JSON, reset the selected database from 01_init.sql and 03_setup.sql, and run the functional tests in order.
+
+The legacy sample unit tests are still available under SAMPLE_MLM for reference, but the normal development path no longer requires copying Beacon.pm or editing SAMPLE_home paths.

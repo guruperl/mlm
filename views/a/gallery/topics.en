@@ -20,16 +20,21 @@
 </thead><tbody>[% FOREACH item=topics %]
 <tr>
 <td><a href="gallery?action=edit&galleryid=[% item.galleryid %]">[% item.galleryid %]</a></td>
-<td>[% IF item.logo %]<a href='[% item.logo %]'><img border=0 width=100 src='[% item.logo %]' border=0></a>[% END %]</td>
-<td>[% IF item.full %]<a href='[% item.full %]'><img border=0 width=100 src='[% item.full %]' border=0></a>[% END %]</td>
-<td>[% item.status %]</td>
-<td>[% item.title %]</td>
-<td>[% item.description %]</td>
+<td>[% IF item.logo %]<a href='[% item.logo | html %]'><img border=0 width=100 src='[% item.logo | html %]' border=0></a>[% END %]</td>
+<td>[% IF item.full %]<a href='[% item.full | html %]'><img border=0 width=100 src='[% item.full | html %]' border=0></a>[% END %]</td>
+<td>[% item.status | html %]</td>
+<td>[% item.title | html %]</td>
+<td>[% item.description | html %]</td>
 <td>[% item.created %]</td>
 <td>[% item.price %]</td>
 <td>[% item.bv %]</td>
 <td>
-<a class="btn btn-sm btn-danger" onclick="javascript:confirm('Do you really want to delete [% item.title %]?')" href="gallery?action=delete&galleryid=[% item.galleryid %]">Del</a>
+<form method=post action=gallery style="display:inline" onsubmit="return confirm('Do you really want to delete [% item.title | html %]?')">
+<input type=hidden name=action value=delete>
+<input type=hidden name=galleryid value="[% item.galleryid %]">
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
+<button class="btn btn-sm btn-danger" type=submit>Del</button>
+</form>
 </td>
 </tr>
 [% END %]</tbody>
@@ -40,13 +45,14 @@
 
 <form class="form" action=gallery enctype="multipart/form-data" method=post>
 <input type=hidden name=action value="insert">
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
      <div class="row">
         <div class="col-md-12 order-md-1">
             <div class="row">
               <div class="col-md-4 mb-3">
                 <label for="title">Category</label>
 				[% IF categoryid %]<input type=hidden name='categoryid' value='[% categoryid %]'>[% ELSE %]
-<select name='categoryid' class="form-control"><option value="">--select--</option>[% FOREACH item=category_topics %]<option value="[% item.categoryid %]">[% item.title %]</option>[% END %]</select>[% END %]
+<select name='categoryid' class="form-control"><option value="">--select--</option>[% FOREACH item=category_topics %]<option value="[% item.categoryid %]">[% item.title | html %]</option>[% END %]</select>[% END %]
               </div>
 
               <div class="col-md-4 mb-3">
@@ -98,12 +104,12 @@
 
               <div class="col-md-4 mb-3">
                 <label for="fullupload">Full Logo Upload</label>
-                <input type="file" class="form-control-file" id="fullupload" name="logoupload">
+                <input type="file" class="form-control-file" id="fullupload" name="fullupload">
               </div>
 
               <div class="col-md-4 mb-3">
                 <label for="description">Description</label>
-                <textarea class="form-control" rows=4 placeholder="Description"></textarea>
+                <textarea class="form-control" rows=4 name=description placeholder="Description"></textarea>
               </div>
             </div>
 

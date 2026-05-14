@@ -1,11 +1,11 @@
 [% INCLUDE start.en %]
 [% SET item=edit.0 %]
 
-<h2>[% item.title %]</h2>
+<h2>[% item.title | html %]</h2>
 
 <div class=row>
 <div class="col-12">
-Category: [% item.category %]; Status: <em>[% item.status %]</em>
+Category: [% item.category | html %]; Status: <em>[% item.status | html %]</em>
 </div>
 </div>
 
@@ -18,7 +18,7 @@ Category: [% item.category %]; Status: <em>[% item.status %]</em>
 <th>[% IF atom.party=='a' %]Replied[% ELSE %]Asked[% END %]</th>
 <td>[% atom.created %]</td>
 </tr>
-<tr><td colspan=2>[% atom.description %]</td></tr>
+<tr><td colspan=2>[% atom.description | html %]</td></tr>
 [% END %]</tbody>
 </table>
 	</div>

@@ -14,13 +14,18 @@
 </tr></thead>
 <tbody>[% FOREACH item=topics %]
 <tr>
-<td>[% item.login %]</td>
+<td>[% item.login | html %]</td>
 <td align=center>[% IF item.adminid.search("ROOT") %]✔[% END %]</td>
 <td align=center>[% IF item.adminid.search("ACCOUNTING") %]✔[% END %]</td>
 <td align=center>[% IF item.adminid.search("MARKETING") %]✔[% END %]</td>
 <td align=center>[% IF item.adminid.search("SUPPORT") %]✔[% END %]</td>
 <td align=center>[% IF item.status.search("Yes") %]✔[% END %]</td>
-<td><a onclick="return confirm('Are you sure to delete [% item.login %]?\nThis operation can't be reversed.')" href="admin?action=delete&login=[% item.login %]">DEL</a></td>
+<td><form method=post action=admin style="display:inline" onsubmit="return confirm('Are you sure to delete [% item.login | html %]?\nThis operation cannot be reversed.')">
+<input type=hidden name=action value=delete>
+<input type=hidden name=login value="[% item.login | html %]">
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
+<button class="btn btn-sm btn-danger" type=submit>DEL</button>
+</form></td>
 </tr>[% END %]
 </tbody></table>
 
@@ -29,6 +34,7 @@
 
 <form method=post action=admin>
 <input type=hidden name=action value=insert>
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
      <div class="row">
         <div class="col-md-12 order-md-1">
             <div class="row">
@@ -38,6 +44,12 @@
                 <div class="invalid-feedback">
                   Valid first name is required.
                 </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="passwd">Password:</label>
+                <input type="password" class="form-control" id="passwd" name="passwd" required>
               </div>
             </div>
             <div class="row">

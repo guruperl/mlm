@@ -16,10 +16,10 @@
 </tr>
 </thead><tbody>[% FOREACH item=topics %]
 <tr>
-<td>[% IF item.logo %]<a href='[% item.logo %]'><img border=0 width=100 src='[% item.logo %]' border=0></a>[% END %]</td>
-<td>[% IF item.full %]<a href='[% item.full %]'><img border=0 width=100 src='[% item.full %]' border=0></a>[% END %]</td>
-<td>[% item.title %]</td>
-<td>[% item.description %]</td>
+<td>[% IF item.logo %]<a href='[% item.logo | html %]'><img border=0 width=100 src='[% item.logo | html %]' border=0></a>[% END %]</td>
+<td>[% IF item.full %]<a href='[% item.full | html %]'><img border=0 width=100 src='[% item.full | html %]' border=0></a>[% END %]</td>
+<td>[% item.title | html %]</td>
+<td>[% item.description | html %]</td>
 <td>[% item.price %]</td>
 <td>[% item.bv %]</td>
 <td><a class="btn btn-sm btn-primary" href="gallery?action=edit&galleryid=[% item.galleryid %]">View</a>

@@ -11,7 +11,7 @@
 		"dashboard"  :{"groups":["m"], "validate" :["memberid"], "method":["GET"]},
 		"edit"       :{"groups":["m"], "validate" :["memberid"]},
 
-		"resetpass"  :{"validate": [ "memberid", "newpasswd"] },
+		"resetpass"  :{"validate": [ "memberid", "newpasswd"], "method":["POST"], "options":["csrf"] },
 		"insert"     :{},
 		"bulk"       :{"method":["POST"], "options":["csrf"]},
 		"topics"     :{},

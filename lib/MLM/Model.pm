@@ -58,17 +58,19 @@ sub run_in_transaction {
   $dbh->begin_work if $own_transaction;
 
   my $err;
-  eval {
+  my $exception;
+  my $ok = eval {
     $err = $code->();
-    die $err if $err;
-    $dbh->commit if $own_transaction;
+    1;
   };
-  if ($@) {
-    my $reason = $@;
+  $exception = $@ unless $ok;
+
+  if ($err || $exception) {
     eval { $dbh->rollback if $own_transaction };
-    return $reason;
+    return $err || $exception;
   }
 
+  $dbh->commit if $own_transaction;
   return;
 }
 

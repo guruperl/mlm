@@ -49,38 +49,124 @@ SAMPLE_home/
     └── views/
 ```
 
-### 1.3) Prepare the Web Server
+### 1.3) Install Perl Dependencies
 
-Configure your web server to set the website's `document_root` to `www`. Add both `SAMPLE_home/perl` and `SAMPLE_home/mlm/lib` to the Perl path:
+For development and testing on Ubuntu or Debian, install the required Perl modules with the Makefile:
+
+```bash
+cd SAMPLE_home/mlm
+make deps
+```
+
+The target installs the distribution packages for DBI, DBD::mysql, JSON, Template Toolkit, XML::LibXML, CGI, LWP, Digest::HMAC_SHA1, MIME::Lite, and Test::Class. The `cpanfile` is kept as a module manifest for non-Debian systems or custom dependency tooling.
+
+For a deployed CGI/FastCGI server, add both `SAMPLE_home/perl` and `SAMPLE_home/mlm/lib` to the Perl path:
 
 ```bash
 export PERL5LIB=/SAMPLE_home/perl:/SAMPLE_home/mlm/lib
 ```
 
-Genelet and MLM use only basic third-party modules, which your server may already have. Here are the required modules and corresponding Ubuntu packages:
+### 1.4) Choose a Test Database
 
-| Module | Ubuntu Package |
-|--------|----------------|
-| Test::Class | `sudo apt-get install libtest-class-perl` |
-| Digest::HMAC_SHA1 | `sudo apt-get install libdigest-hmac-perl` |
-| JSON | `sudo apt-get install libjson-perl` |
-| XML::LibXML | `sudo apt-get install libxml-libxml-perl` |
-| Template | `sudo apt-get install libtemplate-perl` |
-| CGI::Fast (optional) | `sudo apt-get install libcgi-fast-perl` |
+The test suite needs an empty MySQL database because it loads schema, seed data, products, members, compensation data, and ledger entries. You can use either Docker MySQL or your own MySQL instance.
 
-### 1.4) Create MySQL Database
+#### 1.4.1) Option A: Docker MySQL
 
-Create a MySQL database with appropriate credentials.
+Use this if you do not already have a MySQL server. MLM includes a repo-owned MySQL 8 test service on host port `53307`. It does not depend on the Genelet framework's Docker Compose file.
 
-#### 1.4.1) Migrate the Database Schema
+```bash
+cd SAMPLE_home/mlm
+make mysql-up
+make mysql-reset
+```
+
+`make mysql-reset` loads `conf/01_init.sql` and `conf/03_setup.sql` into the Docker database `mlm_test` with user/password `mlm`/`mlm`.
+
+#### 1.4.2) Option B: Your Own MySQL
+
+Use this if you already run MySQL locally or on another host. Create a dedicated empty database for tests; do not point the test suite at production data.
+
+Example for a local MySQL server:
+
+```bash
+sudo apt-get install mysql-server default-mysql-client
+sudo mysql
+```
+
+Then run these SQL statements in the MySQL prompt:
+
+```sql
+CREATE DATABASE mlm_test CHARACTER SET utf8;
+CREATE USER 'mlm'@'localhost' IDENTIFIED BY 'mlm';
+GRANT ALL PRIVILEGES ON mlm_test.* TO 'mlm'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+If your MySQL server has binary logging enabled and schema loading fails with error 1419, ask your DBA or run as a MySQL administrator:
+
+```sql
+SET GLOBAL log_bin_trust_function_creators = 1;
+```
+
+Load the schema and seed data through the external-MySQL target:
+
+```bash
+cd SAMPLE_home/mlm
+make mysql-reset-external \
+  MYSQL_HOST=127.0.0.1 \
+  MYSQL_PORT=3306 \
+  MYSQL_DATABASE=mlm_test \
+  MYSQL_USER=mlm \
+  MYSQL_PASSWORD=mlm
+```
+
+The same variables also tell the Perl functional tests where to connect. To run the full suite against your own MySQL:
+
+```bash
+make test-external \
+  MYSQL_HOST=127.0.0.1 \
+  MYSQL_PORT=3306 \
+  MYSQL_DATABASE=mlm_test \
+  MYSQL_USER=mlm \
+  MYSQL_PASSWORD=mlm
+```
+
+For a remote MySQL server, replace `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, and `MYSQL_PASSWORD` with that server's values. Make sure the MySQL user is allowed to connect from your client host and has full privileges on the test database.
+
+### 1.5) Create a Production MySQL Database
+
+For production, create a MySQL database with appropriate credentials and load the schema with a MySQL client.
+
+Example:
+
+```bash
+sudo mysql
+```
+
+```sql
+CREATE DATABASE mlm_prod CHARACTER SET utf8;
+CREATE USER 'mlm_prod_user'@'localhost' IDENTIFIED BY 'CHANGE_THIS_PASSWORD';
+GRANT ALL PRIVILEGES ON mlm_prod.* TO 'mlm_prod_user'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+For a remote application server, replace `'localhost'` with the host or subnet that will connect to MySQL. After creating the database, set the `Db` block in `conf/config.json`:
+
+```json
+"Db": ["dbi:mysql:database=mlm_prod;host=127.0.0.1;port=3306", "mlm_prod_user", "CHANGE_THIS_PASSWORD"]
+```
+
+Use a strong password, keep production credentials out of test scripts, and do not reuse the sample `mlm`/`mlm` test account for production.
+
+#### 1.5.1) Migrate the Database Schema
 
 Load the database schema from `conf/01_init.sql` using a MySQL client tool.
 
-#### 1.4.2) Migrate Initial Data
+#### 1.5.2) Migrate Initial Data
 
 Load `conf/03_setup.sql` to create one compensation plan, one backend admin user, and one member for the initial website launch.
 
-### 1.5) Configure config.json and component.json
+### 1.6) Configure config.json and component.json
 
 Copy the sample configuration file:
 
@@ -101,7 +187,9 @@ export PERL5LIB=/SAMPLE_home/perl:/SAMPLE_home/mlm/lib
 # Replace SAMPLE_home with your actual path
 ```
 
-#### 1.5.1) Domain Name in Cookies
+The test harness can run against `conf/SAMPLE_config.json` directly. `MLM::Beacon` rewrites its sample paths to the current checkout and defaults the DB connection to the test database. You can override those values with `MLM_CONFIG`, `MLM_DB_DSN`, `MLM_DB_USER`, `MLM_DB_PASSWORD`, `MLM_LIB`, and `GENELET_LIB`.
+
+#### 1.6.1) Domain Name in Cookies
 
 The authentication cookies' `Domain` must exactly match the website domain in `config.json`; otherwise, login error code 1036 will occur.
 
@@ -110,7 +198,7 @@ The authentication cookies' `Domain` must exactly match the website domain in `c
 | `http://noniland.com` | `noniland.com` |
 | `http://www.noniland.com` | `www.noniland.com` |
 
-#### 1.5.2) File Uploads in component.json
+#### 1.6.2) File Uploads in component.json
 
 By default, uploaded files are saved in `Uploaddir`. You can override this by specifying a folder in `component.json`. For example, product photos are uploaded to `Document_root/product` as shown in `lib/MLM/Gallery/component.json`:
 
@@ -124,50 +212,35 @@ By default, uploaded files are saved in `Uploaddir`. You can override this by sp
 }
 ```
 
-#### 1.5.3) HTTP GET Method in component.json
+#### 1.6.3) HTTP Method and CSRF Policy in component.json
 
-For security, the HTTP GET method is allowed only for RESTful actions: `topics`, `edit`, `delete`, and `startnew`. If you create a custom action that requires GET, add `"method": ["GET"]` to `component.json`.
+For security, custom actions must explicitly declare allowed HTTP methods in `component.json`. Safe reads should use GET; mutating actions should use POST and include `"options": ["csrf"]` for authenticated roles.
 
-### 1.6) Run Unit Tests
+Browser forms and JSON responses for authenticated roles use a CSRF token named `csrf`. JSON clients should read the latest token from `relationships.csrf` and send it back as the `csrf` form field on later mutating POST requests.
 
-Follow the instructions in `conf/05_read.me` to add `Beacon.pm`, `admin.t`, and `placement.t` to the appropriate directories:
+### 1.7) Run Tests
 
-```
-SAMPLE_home/mlm/lib/MLM/
-├── Beacon.pm
-├── Admin/
-│   └── admin.t
-└── Placement/
-    └── placement.t
-```
-
-Run the unit tests:
-
-```bash
-cd SAMPLE_home/mlm/lib/MLM/Admin
-perl admin.t
-
-cd ../Placement
-perl placement.t
-```
-
-### 1.7) Run Functional Tests
-
-Follow the instructions in `conf/06_read.me` to set up the `bin` directory. Create a `logs` directory for debugging messages:
+With Docker MySQL, run the full compile, JSON, unit, reset, and functional test sequence:
 
 ```bash
 cd SAMPLE_home/mlm
-mkdir -p logs bin
-cp conf/SAMPLE_bin/* bin/
-# Update 'SAMPLE_home' in the bin/ files to your actual path
-
-cd bin
-perl 01_product.t
-perl 02_member.t
-perl 03_income.t
-perl 04_ledger.t
-perl 05_shopping.t
+make test
 ```
+
+With your own MySQL, use:
+
+```bash
+cd SAMPLE_home/mlm
+make test-external MYSQL_HOST=127.0.0.1 MYSQL_PORT=3306 MYSQL_DATABASE=mlm_test MYSQL_USER=mlm MYSQL_PASSWORD=mlm
+```
+
+The functional tests run in this order because each file builds on the state from the prior one:
+
+- `conf/SAMPLE_bin/01_product.t`
+- `conf/SAMPLE_bin/02_member.t`
+- `conf/SAMPLE_bin/03_income.t`
+- `conf/SAMPLE_bin/04_ledger.t`
+- `conf/SAMPLE_bin/05_shopping.t`
 
 ### 1.8) Build Week Tables
 

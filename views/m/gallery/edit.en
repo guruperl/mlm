@@ -1,11 +1,11 @@
 [% INCLUDE start.en %]
 [% SET item=edit.0 %]
 
-<h2>Details of [% item.title %]</h2>
+<h2>Details of [% item.title | html %]</h2>
 
 <div class=row>
 	<div class="col-12">
-<img src="[% item.full %]" style="float: left">
+<img src="[% item.full | html %]" style="float: left">
 	</div>
 </div>
 <div class=row>
@@ -14,12 +14,13 @@ Price: $[% item.price %]
 BV: $[% item.bv %]
 	</div>
 	<div class="col-12">
-[% item.description %]
+[% item.description | html %]
 	</div>
 </div>
 
 <form action="basket" method=post>
 <input type=hidden name="action" value="insert">
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
 <input type=hidden name="classify" value="gallery">
 <input type=hidden name="id" value="[% item.galleryid %]">
 <p>

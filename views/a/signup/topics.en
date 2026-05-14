@@ -29,17 +29,17 @@ Page: [% SET i=1 %][% WHILE (i <= maxpageno) %]
 </tr>
 </thead><tbody>
 [% FOREACH item=topics %]
-<form name=name[% item.signupid %] method=post action="member"><input type=hidden name="action" value="insert"><input type=hidden name="signupid" value="[% item.signupid %]"><tr>
+<form name=name[% item.signupid %] method=post action="member"><input type=hidden name="action" value="insert">[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]<input type=hidden name="signupid" value="[% item.signupid %]"><tr>
 <td><a href="signup?action=edit&signupid=[% item.signupid %]">[% item.signupid %]</a></td>
 <td>[% item.memberid %]</td>
-<td>[% item.login %]</td>
+<td>[% item.login | html %]</td>
 <td><a href="member?action=edit&memberid=[% item.sid %]">[% item.sidlogin %]</a></td>
 <td><a href="member?action=edit&memberid=[% item.pid %]">[% item.plogin %]</a>[% item.credit %]</td>
 <td>[% item.leg %]</td>
 <td>[% item.short %]</td>
 <td>[% item.signuptime %]</td>
 <td><input class="form-control" type=text name=billingid></td>
-<td><select class="form-control name=paytype><option value="Manual">Manual</option>
+<td><select class="form-control" name=paytype><option value="Manual">Manual</option>
 <option value="CC">Credit Card</option>
 <option value="Check">Cheque</option>
 <option value="Advanced">Points</option>
@@ -48,8 +48,13 @@ Page: [% SET i=1 %][% WHILE (i <= maxpageno) %]
 </td>
 <td><input class="form-control" type=text name="affiliate"></td>
 <td><button class="btn btn-sm btn-primary" type=submit>Activate</button></td>
-<td><a class="btn btn-sm btn-danger" onclick="return confirm('Are you sure to remove this application?\nThis action cannot be reversed.')" href="signup?action=delete&signupid=[% item.signupid %]">DEL</a></td>
-</tr></form>
+<td></form><form method=post action=signup style="display:inline" onsubmit="return confirm('Are you sure to remove this application?\nThis action cannot be reversed.')">
+<input type=hidden name=action value=delete>
+<input type=hidden name=signupid value="[% item.signupid %]">
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
+<button class="btn btn-sm btn-danger" type=submit>DEL</button>
+</form></td>
+</tr>
 [% END %]</tbody>
 </table>
 </div>

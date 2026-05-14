@@ -1,6 +1,6 @@
 [% INCLUDE start.en %]
 
-<form class="form-inline" name=f0 action=member method=post>
+<form class="form-inline" name=f0 action=sale method=get>
     <div class="row">
         <div class="col-sm-3">Search [% paystatus %][% paytype %]:</div>
         <div class="col-sm-3">
@@ -10,7 +10,7 @@
 </select>
 </div>
         <div class="col-sm-3">
-<input class="form-control" type=text name=v value="[% v %]">
+<input class="form-control" type=text name=v value="[% v | html %]">
 		</div>
 		<div class="col-sm-1"> </div>
         <div class="col-sm-2">
@@ -52,11 +52,11 @@ Page: [% SET i=1 %][% WHILE (i <= maxpageno) %]
 <td>[% item.created %]</td>
 <td><a href="member?action=edit&memberid=[% item.memberid %]">[% item.name %][% item.memberid %]</a></td>
 <td>[% item.signuptype %]</td>
-<td>[% item.paytype %]</td>
-<td>[% item.paystatus %]</td>
-<td>[% item.billingid %]
-<td>[% item.remark %]</td>
-<td>[% IF (paystatus=='Processing' || paystatus=='Pending') %]<button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#saleModal[% item.saleid %]">Track</button>[% ELSE %][% item.trackingid %][% END %]</td>
+<td>[% item.paytype | html %]</td>
+<td>[% item.paystatus | html %]</td>
+<td>[% item.billingid | html %]
+<td>[% item.remark | html %]</td>
+<td>[% IF (paystatus=='Processing' || paystatus=='Pending') %]<button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#saleModal[% item.saleid %]">Track</button>[% ELSE %][% item.trackingid | html %][% END %]</td>
 </tr>
 [% END %]</tbody>
 </table>
@@ -88,6 +88,7 @@ Remark: <input type=text class="form-control" name=remark placeholder="Your rema
 	  <form name="form_2_[% item.saleid %]" class=form method=post action="sale">
 	  <input type=hidden name=action value=update>
 	  <input type=hidden name=saleid value=[% item.saleid %]>
+	  [% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
       <div class="modal-body">[% IF (paystatus=='Pending') %]<input type=hidden name=paystatus value="Processing">
 <h6>Change status to <em>Processing or Packaging</em></h6>
 <div classs=row>

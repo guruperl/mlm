@@ -20,28 +20,37 @@
 <form name=form[% item.packageid %] class=form method=post action=package>
 <input type=hidden name=packageid value="[% item.packageid %]">
 <input type=hidden name=action value="update">
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
 <tr>
 <td><a href="packagedetail?action=topics&packageid=[% item.packageid %]">[% item.packageid %]</a></td>
 <td><select class="form-control form-control-sm" name=typeid>[% FOREACH t=packagetype_topics %]
-<option [% IF (item.typeid==t.typeid) %]selected[% END %] value=[% t.typeid %]>[% t.name %]</option>
+<option [% IF (item.typeid==t.typeid) %]selected[% END %] value=[% t.typeid %]>[% t.name | html %]</option>
 [% END %]</select>
-<input class="form-control form-control-sm" type=text name=title value='[% item.title %]'>
+<input class="form-control form-control-sm" type=text name=title value='[% item.title | html %]'>
 </td>
-<td><textarea class="form-control" name=description rows=3>[% item.description %]</textarea></td>
+<td><textarea class="form-control" name=description rows=3>[% item.description | html %]</textarea></td>
 <td>[% item.price %]</td>
 <td>[% item.sh %]</td>
 <td>[% item.packagetype_topics.0.bv %]</td>
 <td>[% item.sumnum %]</td>
 <td><button class="btn btn-sm btn-primary" type=submit>Upd</button></td>
-<td><a class="btn btn-sm btn-danger" onclick="javascript:confirm('Are you sure to delete this package?')" href="package?action=delete&packageid=[% item.packageid %]">DEL</a></td>
 </tr>
 </form>
+<tr>
+<td colspan=9><form method=post action=package style="display:inline" onsubmit="return confirm('Are you sure to delete this package?')">
+<input type=hidden name=action value=delete>
+<input type=hidden name=packageid value="[% item.packageid %]">
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
+<button class="btn btn-sm btn-danger" type=submit>DEL</button>
+</form></td>
+</tr>
 [% END %]</tbody>
 </table>
 </div>
 
 <form name=forminsert class="form" action=package method=post>
 <input type=hidden name=action value="insert">
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
      <div class="row">
         <div class="col-md-12 order-md-1">
             <div class="row">
@@ -55,7 +64,7 @@
               <div class="col-md-4 mb-3">
                 <label for="typeid">Package Type</label>
                 <select class="form-control" name="typeid"><option value="">--select--</option>[% FOREACH t=packagetype_topics %]
-<option value=[% t.typeid %]>[% t.name %]</option>
+<option value=[% t.typeid %]>[% t.name | html %]</option>
 [% END %]</select>
               </div>
             </div>

@@ -23,13 +23,17 @@ Page: [% SET i=1 %][% WHILE (i <= maxpageno) %]
 </thead><tbody>[% FOREACH item=topics %]
 <tr>
 <td><a href='member?action=edit&memberid=[% item.memberid %]'>[% item.memberid %]</a></td>
-<td>[% item.login %]</td>
-<td>[% item.firstname %] [% item.lastname %]</td>
+<td>[% item.login | html %]</td>
+<td>[% item.firstname | html %] [% item.lastname | html %]</td>
 <td>[% item.typeid %]</td>
 <td>[% item.created %]</td>
 <td>
-<a class="btn btn-sm btn-danger" 
-onclick="javascript:confirm('Do you really want to delete [% item.login %]?!')" href='affiliate?action=delete&memberid=[% item.memberid %]')">Del</a>
+<form method=post action=affiliate style="display:inline" onsubmit="return confirm('Do you really want to delete [% item.login | html %]?!')">
+<input type=hidden name=action value=delete>
+<input type=hidden name=memberid value="[% item.memberid %]">
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
+<button class="btn btn-sm btn-danger" type=submit>Del</button>
+</form>
 </td>
 </tr>
 [% END %]</tbody>
@@ -40,6 +44,7 @@ onclick="javascript:confirm('Do you really want to delete [% item.login %]?!')" 
 
 <form class=form id=newform action=affiliate method=post>
 <input type=hidden name=action value="insert" />
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
      <div class="row">
         <div class="col-md-12 order-md-1">
             <div class="row">

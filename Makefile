@@ -2,17 +2,23 @@ SHELL := /bin/bash
 
 COMPOSE := docker compose -f docker-compose.test.yml
 MYSQL_SERVICE := mysql
-TEST_PERL5LIB := ../perl:lib
+MYSQL_HOST ?= 127.0.0.1
+MYSQL_PORT ?= 53307
+MYSQL_DATABASE ?= mlm_test
+MYSQL_USER ?= mlm
+MYSQL_PASSWORD ?= mlm
+GENELET_LIB ?= ../perl
+TEST_PERL5LIB := $(GENELET_LIB):lib
 export PERL5LIB := $(TEST_PERL5LIB)
-export MLM_DB_DSN ?= dbi:mysql:database=mlm_test;host=127.0.0.1;port=53307
-export MLM_DB_USER ?= mlm
-export MLM_DB_PASSWORD ?= mlm
+export MLM_DB_DSN ?= dbi:mysql:database=$(MYSQL_DATABASE);host=$(MYSQL_HOST);port=$(MYSQL_PORT)
+export MLM_DB_USER ?= $(MYSQL_USER)
+export MLM_DB_PASSWORD ?= $(MYSQL_PASSWORD)
 
-.PHONY: deps mysql-up mysql-reset compile-check json-check unit-test functional-test test
+.PHONY: deps mysql-up mysql-reset mysql-reset-external compile-check json-check unit-test functional-test test test-external
 
 deps:
 	sudo apt-get update
-	sudo apt-get install -y libdbi-perl libdbd-mysql-perl libjson-perl libcgi-pm-perl libhttp-message-perl libwww-perl libtemplate-perl libxml-libxml-perl libtest-class-perl libdigest-hmac-perl libmime-lite-perl
+	sudo apt-get install -y default-mysql-client libdbi-perl libdbd-mysql-perl libjson-perl libcgi-pm-perl libhttp-message-perl libwww-perl libtemplate-perl libxml-libxml-perl libtest-class-perl libdigest-hmac-perl libmime-lite-perl
 
 mysql-up:
 	$(COMPOSE) up -d $(MYSQL_SERVICE)
@@ -28,17 +34,21 @@ mysql-reset:
 	$(COMPOSE) exec -T $(MYSQL_SERVICE) mysql -umlm -pmlm mlm_test < conf/01_init.sql
 	$(COMPOSE) exec -T $(MYSQL_SERVICE) mysql -umlm -pmlm mlm_test < conf/03_setup.sql
 
+mysql-reset-external:
+	MYSQL_PWD='$(MYSQL_PASSWORD)' mysql -h '$(MYSQL_HOST)' -P '$(MYSQL_PORT)' -u '$(MYSQL_USER)' '$(MYSQL_DATABASE)' < conf/01_init.sql
+	MYSQL_PWD='$(MYSQL_PASSWORD)' mysql -h '$(MYSQL_HOST)' -P '$(MYSQL_PORT)' -u '$(MYSQL_USER)' '$(MYSQL_DATABASE)' < conf/03_setup.sql
+
 compile-check:
-	@find lib/MLM ../perl/Genelet -name '*.pm' -print0 | xargs -0 -n1 perl -I../perl -Ilib -c
+	@find lib/MLM $(GENELET_LIB)/Genelet -name '*.pm' -print0 | xargs -0 -n1 perl -I$(GENELET_LIB) -Ilib -c
 
 json-check:
 	@find lib/MLM -name component.json -print0 | xargs -0 -n1 jq -e . >/dev/null
 
 unit-test:
-	prove -I../perl -Ilib lib/MLM
+	prove -I$(GENELET_LIB) -Ilib lib/MLM
 
 functional-test:
-	prove -I../perl -Ilib \
+	prove -I$(GENELET_LIB) -Ilib \
 	  conf/SAMPLE_bin/01_product.t \
 	  conf/SAMPLE_bin/02_member.t \
 	  conf/SAMPLE_bin/03_income.t \
@@ -46,3 +56,5 @@ functional-test:
 	  conf/SAMPLE_bin/05_shopping.t
 
 test: compile-check json-check unit-test mysql-reset functional-test
+
+test-external: compile-check json-check unit-test mysql-reset-external functional-test

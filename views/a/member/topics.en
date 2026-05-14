@@ -1,6 +1,6 @@
 [% INCLUDE start.en %]
 
-<form name=name1 action=member method=post>
+<form name=name1 action=member method=get>
 	<div class="row">
 		<div class="col-sm-1">Search:</div>
 		<div class="col-sm-11">
@@ -11,7 +11,7 @@
 <option [% IF u=='firstname' %]selected[% END %] value='firstname'>First Name</option>
 <option [% IF u=='signuptime' %]selected[% END %] value='signuptime'>Signup Datetime</option>
 </select>
-<span id="qMem"><input type=text name=v value="[% v %]" size=10></span>
+<span id="qMem"><input type=text name=v value="[% v | html %]" size=10></span>
 <span id="qDate" style="display:none;">
 <select name=y1 size=1>
 <option value='2019' [% IF y1=='2019' %]selected[% END %] >2019</option>
@@ -99,17 +99,17 @@ Page: [% SET i=1 %][% WHILE (i <= maxpageno) %]
 			</tr></thead><tbody>[% FOREACH item=topics %]
 			<tr>
 			<td><a href="member?action=edit&memberid=[% item.memberid %]">[% item.memberid %]</a></td>
-			<td>[% item.login %]</td>
-			<td>[% item.active %]</td>
-			<td>[% item.typename %]</td>
-			<td>[% item.firstname %] [% item.lastname %]</td>
-			<td>[% item.signuptime %]</td>
+			<td>[% item.login | html %]</td>
+			<td>[% item.active | html %]</td>
+			<td>[% item.typename | html %]</td>
+			<td>[% item.firstname | html %] [% item.lastname | html %]</td>
+			<td>[% item.signuptime | html %]</td>
 			<td><a href="member?action=edit&memberid=[% item.sid %]">[% item.sid %]</a></td>
 			<td><a href="member?action=edit&memberid=[% item.pid %]">[% item.pid %]</a></td>
 			<td>[% item.leg %]</td>
-			<td><a class="btn btn-sm btn-outline-success" href="placement?action=view_binary&login=[% item.login %]&memberid=[% item.memberid %]">Binary</a></td>
-			<td><a class="btn btn-sm btn-outline-info" href="sponsor?action=view_sponsor&login=[% item.login %]&memberid=[% item.memberid %]">Matrix</a></td>
-			<td><a class="btn btn-sm btn-primary" target=_blank href="member?action=enter&login=[% item.login %]&memberid=[% item.memberid %]">ENTER</a></td>
+			<td><a class="btn btn-sm btn-outline-success" href="placement?action=view_binary&login=[% item.login | uri %]&memberid=[% item.memberid | uri %]">Binary</a></td>
+			<td><a class="btn btn-sm btn-outline-info" href="sponsor?action=view_sponsor&login=[% item.login | uri %]&memberid=[% item.memberid | uri %]">Matrix</a></td>
+			<td><a class="btn btn-sm btn-primary" target=_blank href="member?action=enter&login=[% item.login | uri %]&memberid=[% item.memberid | uri %]">ENTER</a></td>
 			</tr>
 		[% END %]</tbody>
 		</table>

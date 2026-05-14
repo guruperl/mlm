@@ -13,6 +13,8 @@ This document outlines the architecture and implementation strategy for the MLM 
 The app communicates with the backend using the structure:
 `https://{domain}/cgi-bin/goto/{ROLE}/json/{COMPONENT}?action={ACTION}`
 
+Authenticated JSON responses include a CSRF token at `relationships.csrf`. Store the latest token for each signed-in role and include it as a `csrf` form field on mutating POST requests such as buying, changing profile defaults, changing passwords, replying to tickets, and admin compensation runs.
+
 ### Authentication Flow
 * **Login**: `POST /m/json/member`
   * Body: `login`, `passwd`
@@ -42,6 +44,9 @@ The app communicates with the backend using the structure:
 3. **Dashboard**:
    * Endpoint: `GET /m/json/member?action=dashboard`
    * Displays user profile and business statistics.
+4. **Basket Checkout**:
+   * Endpoint: `POST /m/json/sale?action=buy`
+   * Requires the latest member CSRF token.
 
 ## 4. Implementation Steps
 1. **Scaffold**: Initialize Expo project and install dependencies.

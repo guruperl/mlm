@@ -1,6 +1,6 @@
 [% INCLUDE start.en %]
 
-<form name=name1 action=tt method=post>
+<form name=name1 action=tt method=get>
     <div class="row">
         <div class="col-sm-2">Search:</div>
         <div class="col-sm-10">
@@ -8,7 +8,7 @@
 <option [% IF u=='memberid' %]selected[% END %] value='memberid'>Member ID</option>
 <option [% IF u=='created' %]selected[% END %] value='created'>Datetime</option>
 </select>
-<span id="qMem"><input type=text name=v value="[% v %]" size=10></span>
+<span id="qMem"><input type=text name=v value="[% v | html %]" size=10></span>
 <span id="qDate" style="display:none;">
 <select name=y1>
 <option value='2019' [% IF y1=='2019' %]selected[% END %] >2019</option>
@@ -96,10 +96,10 @@ Page: [% SET i=1 %][% WHILE (i <= maxpageno) %]
 <tr>
 <td><a href="tt?action=edit&subjectid=[% item.subjectid %]">[% item.subjectid %]</a></td>
 <td>[% item.memberid %]</td>
-<td>[% item.title %]</td>
-<td>[% item.category %]</td>
-<td>[% item.status %]</td>
-<td>[% item.created %]</td>
+<td>[% item.title | html %]</td>
+<td>[% item.category | html %]</td>
+<td>[% item.status | html %]</td>
+<td>[% item.created | html %]</td>
 </tr>
 [% END %]</tbody>
 </table>
