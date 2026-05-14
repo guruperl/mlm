@@ -9,6 +9,11 @@ MYSQL_USER ?= mlm
 MYSQL_PASSWORD ?= mlm
 GENELET_LIB ?= ../perl
 TEST_PERL5LIB := $(GENELET_LIB):lib
+UNIT_TESTS := $(shell find lib/MLM -name '*.t' \
+	! -path 'lib/MLM/Test/*' \
+	! -path 'lib/MLM/Admin/admin.t' \
+	! -path 'lib/MLM/Placement/placement.t' \
+	-print | sort)
 export PERL5LIB := $(TEST_PERL5LIB)
 export MLM_DB_DSN ?= dbi:mysql:database=$(MYSQL_DATABASE);host=$(MYSQL_HOST);port=$(MYSQL_PORT)
 export MLM_DB_USER ?= $(MYSQL_USER)
@@ -45,7 +50,7 @@ json-check:
 	@find lib/MLM -name component.json -print0 | xargs -0 -n1 jq -e . >/dev/null
 
 unit-test:
-	prove -I$(GENELET_LIB) -Ilib lib/MLM
+	prove -I$(GENELET_LIB) -Ilib $(UNIT_TESTS)
 
 functional-test:
 	prove -I$(GENELET_LIB) -Ilib \
