@@ -1,5 +1,11 @@
 # MLM
 
+[![Tests](https://github.com/guruperl/mlm/actions/workflows/test.yml/badge.svg)](https://github.com/guruperl/mlm/actions/workflows/test.yml)
+[![License: LGPL-2.1](https://img.shields.io/badge/license-LGPL--2.1-blue.svg)](LICENSE)
+[![Perl](https://img.shields.io/badge/perl-5.10%2B-39457E.svg)](cpanfile)
+[![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0.3-6BA539.svg)](openapi.yaml)
+[![Genelet](https://img.shields.io/badge/framework-Genelet-informational.svg)](https://github.com/guruperl/perl)
+
 A comprehensive open-source Multi-Level Marketing (MLM) package offering registration, membership management, compensation structures, automated tasks, shopping capabilities, ticketing systems, and backend administration. The package includes four built-in bonus plans: Unilevel, Team, Pairing, and Affiliate. Developers can easily extend these to create custom bonus plans.
 
 The software is built on [Genelet](https://github.com/guruperl/perl), an open-source web development framework designed for creating secure, scalable, and high-performance websites.

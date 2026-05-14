@@ -23,7 +23,7 @@ export MLM_DB_PASSWORD ?= $(MYSQL_PASSWORD)
 
 deps:
 	sudo apt-get update
-	sudo apt-get install -y default-mysql-client libdbi-perl libdbd-mysql-perl libjson-perl libcgi-pm-perl libhttp-message-perl libwww-perl libtemplate-perl libxml-libxml-perl libtest-class-perl libdigest-hmac-perl libmime-lite-perl
+	sudo apt-get install -y default-mysql-client jq libdbi-perl libdbd-mysql-perl libjson-perl libcgi-pm-perl libhttp-message-perl libwww-perl libtemplate-perl libxml-libxml-perl libtest-class-perl libdigest-hmac-perl libmime-lite-perl
 
 mysql-up:
 	$(COMPOSE) up -d $(MYSQL_SERVICE)

@@ -1,0 +1,41 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out MLM
+        uses: actions/checkout@v4
+        with:
+          path: mlm
+
+      - name: Check out Genelet
+        uses: actions/checkout@v4
+        with:
+          repository: guruperl/perl
+          path: perl
+
+      - name: Install dependencies
+        working-directory: mlm
+        run: make deps
+
+      - name: Run test suite
+        working-directory: mlm
+        run: |
+          make mysql-up
+          make test
+
+      - name: Show MySQL logs
+        if: failure()
+        working-directory: mlm
+        run: docker compose -f docker-compose.test.yml logs mysql
