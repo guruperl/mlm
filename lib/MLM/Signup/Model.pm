@@ -100,7 +100,7 @@ sub update_miles {
 
   return $self->do_sql( 
 "UPDATE family_leftright INNER JOIN family
-ON leftright.memberid=family.parent AND leftright.level=family.level
+ON family_leftright.memberid=family.parent AND family_leftright.level=family.level
 SET numleft=numleft+($c)
 WHERE family.child=? AND leg='L'", $memberid)
 	|| $self->do_sql(
@@ -110,8 +110,8 @@ WHERE memberid IN
 (SELECT parent FROM family WHERE child=? AND leg='L')", $memberid)
 	|| $self->do_sql(
 "UPDATE family_leftright INNER JOIN family
-ON leftright.memberid=family.parent AND leftright.level=family.level
-SET numleft=numleft+($c)
+ON family_leftright.memberid=family.parent AND family_leftright.level=family.level
+SET numright=numright+($c)
 WHERE family.child=? AND leg='R'", $memberid)
 	|| $self->do_sql(
     #"UPDATE member SET miler=miler+($c), countr=countr+($one)

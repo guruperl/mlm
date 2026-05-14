@@ -19,7 +19,7 @@
 <td>[% IF (item.classify=='package') %]Package[% ELSE %]Item[% END %]</td>
 <td>[% item.title %]</td>
 <td>$[% item.price %]</td>
-<form name=basket[% item.basketid %] class="form-inline" action=basket method="post"><input type=hidden name="action" value="update"><input type=hidden name="basketid" value=[% item.basketid %]>
+<form name=basket[% item.basketid %] class="form-inline" action=basket method="post"><input type=hidden name="action" value="update">[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]<input type=hidden name="basketid" value=[% item.basketid %]>
 <td><input type=text class="form-control-inline col-2" name="qty" value="[% item.qty %]"><button type=submit class="btn btn-sm btn-primary">Upd</button> <a class="btn btn-sm btn-info" href="basket?action=delete&basketid=[% item.basketid %]">Remove</a></td></form>
 <td align=right>$[% item.shipping %]</td>
 <td align=right>$[% item.amount %]</td>
@@ -32,7 +32,7 @@
 [% SET shop = ledger_currentBalance.0.shop_balance %]
 [% SET balance = ledger_currentBalance.0.balance %]
 [% SET have = shop+balance %]
-<form class="form" method=post action="sale"><input type=hidden name="action" value="buy">
+<form class="form" method=post action="sale"><input type=hidden name="action" value="buy">[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
 <p>
 The total payment is $[% need %]. You have $[% have %] in your account, among which the shopping balance is $[% shop %] and the cash balance $[% balance %].
 </p>

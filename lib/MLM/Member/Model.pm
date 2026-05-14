@@ -19,6 +19,15 @@ sub dashboard {
   my $self = shift;
   return $self->edit(shift) || $self->process_after("dashboard", @_);
 }
+
+sub insert {
+  my $self = shift;
+  my @args = @_;
+
+  return $self->run_in_transaction(sub {
+    return $self->SUPER::insert(@args);
+  });
+}
   
 sub startnew {
   my $self = shift;
@@ -72,13 +81,15 @@ ORDER BY signuptime, signupid");
     for my $name (@{$self->{INSERT_PARS}}) {
       $hash->{$name} = $ARGS->{$name} if $ARGS->{$name};
     }
-    $err = $self->insert_hash($hash)
+    $err = $self->run_in_transaction(sub {
+      return $self->insert_hash($hash)
 		|| $self->call_once({model=>"basket", action=>"insert"})
 		|| $self->call_once({model=>"sale", action=>"insert"})
 		|| $self->call_once({model=>"lineitem", action=>"insert"})
 		|| $self->call_once({model=>"signup", action=>"signup_update"})
 		|| $self->call_once({model=>"signup", action=>"add_family"})
 		|| $self->call_once({model=>"signup", action=>"add_miles"});
+    });
     return $err if $err;
     delete $self->{OTHER}->{"basket_insert"};
     delete $ARGS->{"basketid"};

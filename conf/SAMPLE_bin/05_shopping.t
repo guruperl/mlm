@@ -1,11 +1,12 @@
 #!/usr/bin/perl
 
-use lib qw(/SAMPLE_home/mlm/lib /SAMPLE_home/perl);
+use FindBin qw($Bin);
+use lib "$Bin/../../lib", "$Bin/../../../perl";
 use strict;
 use Data::Dumper;
 use JSON;
 use MLM::Beacon;
-use Test::More tests=>6;
+use Test::More;
 
 my $member = MLM::Beacon->new(role=>"m");
 my $err = $member->get_credential("genelet04","1234abcd");
@@ -52,4 +53,5 @@ for my $item (@{$content->{data}}) {
   }
 }
 
+done_testing();
 exit(0);

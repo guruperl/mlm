@@ -7,8 +7,9 @@
 	<div class="row">
 <div class="col-12">
 <strong>Cut from the binary tree</strong>
-<form class="form-inline" action="member" name=name5 method=post>
+<form class="form-inline" action="placement" name=name5 method=post>
 <input type=hidden name=action value=leave_tree>
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
 	<input type="text" class="form-control col-2" name="memberid" placeholder="Member ID" value="[% memberid %]">
 	<div class="form-group mx-sm-3 mb-2">
 		<label for="is_deduct1">To deduct original upline's points?</label>
@@ -25,8 +26,9 @@
 	<div class="row">
 <div class="col-12">
 <strong>Place back to the binary tree</strong>
-<form class="form-inline" action="member" name=name6 method=post>
+<form class="form-inline" action="placement" name=name6 method=post>
 <input type=hidden name=action value=join_tree>
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
 <input class="form-control col-2" type=text name=memberid placeholder="Member ID">
 <input class="form-control col-2" type=text name=pid placeholder="Upline ID">
 	<div class="form-group mx-sm-3 mb-2">

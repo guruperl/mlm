@@ -25,6 +25,7 @@ Category: [% item.category %]; Status: <em>[% item.status %]</em>
 <form action=tt method=post>
 <input type=hidden name=subjectid value='[% item.subjectid %]'>
 <input type=hidden name=action value='reply'>
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
 Add Content:
 <p>
 <textarea cols=50 rows=4 name=description></textarea>

@@ -29,7 +29,10 @@ sub view_sponsor {
 my $name = sub {
     my $item = shift;
 	my $admin = shift;
-	return ($admin) ? "<a href='sponsor?action=view_sponsor&memberid=$item->{memberid}'>".$item->{login}."<br>$item->{memberid}</a>" : $item->{login};
+  my $self = shift;
+  my $login = $self->html_escape($item->{login});
+  my $memberid = $self->html_escape($item->{memberid});
+	return ($admin) ? "<a href='sponsor?action=view_sponsor&amp;memberid=$memberid'>".$login."<br>$memberid</a>" : $login;
 };
 
 sub unilevel {
@@ -51,7 +54,7 @@ INNER JOIN def_type t USING (typeid)");
   }
   
   $self->{LISTS} = [];
-  my $str = "<ul>\n\t<li>\n\t".$name->($ref->{$ARGS->{memberid}}, $ARGS->{_gadmin})."\n";
+  my $str = "<ul>\n\t<li>\n\t".$name->($ref->{$ARGS->{memberid}}, $ARGS->{_gadmin}, $self)."\n";
   $self->_lower_level($ref, $children, \$str, 0, $ARGS->{memberid});
   $str .= "\t</li>\n</ul>\n";
 
@@ -72,7 +75,7 @@ sub _lower_level {
   my $leading = "\t" x ($i+1);
   $$str .= $old . "<ul>\n";
   for my $one (@$lists) {
-    $$str .= $leading . "<li>\n" . $leading. $name->($ref->{$one}, $self->{ARGS}->{_gadmin}) . "\n";
+    $$str .= $leading . "<li>\n" . $leading. $name->($ref->{$one}, $self->{ARGS}->{_gadmin}, $self) . "\n";
     $self->_lower_level($ref, $children, $str, $i, $one);
     $$str .= $leading . "</li>\n";
   }

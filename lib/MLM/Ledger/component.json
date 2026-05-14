@@ -2,7 +2,7 @@
 	"actions" : {
 		"topics"  :{"groups":["m"]},
 		"makeIncome":{},
-		"addShopping":{"validate":["remark"]},
+		"addShopping":{"validate":["remark"], "method":["POST"], "options":["csrf"]},
 		"insert"  :{"validate":["memberid","weekid","amount","balance"]},
 		"delete"  :{"validate":["ledgerid"]},
 		"edit"    :{"groups":["m"],"validate":["ledgerid"]},
@@ -16,7 +16,6 @@
 	"current_id_auto" :"ledgerid",
 	"insert_pars"     :["old_ledgerid","weekid","created","shop_balance","balance","status","amount","remark","memberid","manager"],
 	"update_pars"     :["old_ledgerid","weekid","created","shop_balance","balance","status","amount","remark","memberid","manager","ledgerid"],
-	"topics_pars"     :["old_ledgerid","weekid","created","shop_balance","balance","status","amount","remark","memberid","manager","ledgerid"],
 	"edit_pars"       :["old_ledgerid","weekid","created","shop_balance","balance","status","amount","remark","memberid","manager","ledgerid"],
 
     "current_tables" : [

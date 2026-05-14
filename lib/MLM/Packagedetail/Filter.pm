@@ -51,6 +51,8 @@ sub after {
     my ($form) = @_;
     my $lists = $form->{LISTS};
 
+  return unless ($action eq 'topics');
+
   $ARGS->{sumprice} = $ARGS->{sumbv} =$ARGS->{sumsh} = $ARGS->{sumnumold} = 0;
   foreach my $item (@$lists) {
     $ARGS->{sumnumold} += $item->{num};

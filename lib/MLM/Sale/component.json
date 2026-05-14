@@ -2,7 +2,7 @@
 	"actions" : {
 		"topics"  :{"groups":["m"]},
 		"startnew":{"groups":["m"], "options":["no_method","no_db"]},
-		"buy"  :{"groups":["m"], "method":["GET"]},
+		"buy"  :{"groups":["m"], "method":["POST"], "options":["csrf"]},
 		"insert"  :{},
 		"edit"    :{"groups":["m"], "validate":["saleid"]},
 		"myInvoice":{"groups":["m"], "validate":["saleid"], "method":["GET"]},
@@ -21,7 +21,6 @@
 	"current_id_auto" :"saleid",
 	"insert_pars"     :["credit","trackingid","shipping","paystatus","signuptype","created","billingid","remark","amount",         "paytype","active","memberid",         "manager","typeid"],
 	"update_pars"     :["credit","trackingid","shipping","paystatus","signuptype","created","billingid","remark","amount","saleid","paytype","active","memberid",         "manager","typeid"],
-	"topics_pars"     :["credit","trackingid","shipping","paystatus","signuptype","created","billingid","remark","amount","saleid","paytype","active","memberid","moment","manager","typeid"],
 	"edit_pars"       :["credit","trackingid","shipping","paystatus","signuptype","created","billingid","remark","amount","saleid","paytype","active","memberid","moment","manager","typeid"],
 
 	"current_tables" : [

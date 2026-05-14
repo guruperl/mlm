@@ -6,14 +6,14 @@
 
 		"update"     :{"groups":["m"], "validate" :["memberid"]},
 		"startdef"   :{"groups":["m"], "method":["GET"]},
-		"changedef"  :{"groups":["m"], "method":["GET"]},
-		"changepass" :{"groups":["m"], "validate" :["passwd", "newpasswd"], "method":["GET"]},
+		"changedef"  :{"groups":["m"], "method":["POST"], "options":["csrf"]},
+		"changepass" :{"groups":["m"], "validate" :["passwd", "newpasswd"], "method":["POST"], "options":["csrf"]},
 		"dashboard"  :{"groups":["m"], "validate" :["memberid"], "method":["GET"]},
 		"edit"       :{"groups":["m"], "validate" :["memberid"]},
 
 		"resetpass"  :{"validate": [ "memberid", "newpasswd"] },
 		"insert"     :{},
-		"bulk"       :{"method":["GET"]},
+		"bulk"       :{"method":["POST"], "options":["csrf"]},
 		"topics"     :{},
 		"delete"     :{},
 		"enter"      :{"options":["no_db", "no_method"], "method":["GET"]}

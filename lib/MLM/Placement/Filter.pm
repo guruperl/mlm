@@ -18,7 +18,7 @@ sub preset {
 
 	$ARGS->{max_plevel} = ($who eq 'a') ? $self->{CUSTOM}->{MAX_plevel} :
 							$self->{CUSTOM}->{MAX_mplevel};
-	$ARGS->{top_memberid} = $self->{CUSTOM}->{top_memberid};
+	$ARGS->{top_memberid} = $self->{CUSTOM}->{TOP_memberid};
 
 	if ($action eq 'topics') {
 		$ARGS->{sortby} = "level";

@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 
-use lib qw(/SAMPLE_home/mlm/lib /SAMPLE_home/perl);
+use FindBin qw($Bin);
+use lib "$Bin/../../lib", "$Bin/../../../perl";
 use strict;
 use JSON;
 use MLM::Beacon;
-use Test::More tests=>26;
+use Test::More;
 
 my $admin = MLM::Beacon->new(role=>"a");
 my $err = $admin->get_credential("gmarket","gmarketIsCool");
@@ -44,4 +45,5 @@ for my $item (@{$content->{data}}) {
   }
 } 
 
+done_testing();
 exit;

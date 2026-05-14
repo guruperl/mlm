@@ -3,13 +3,13 @@
 		"topics"       :{"groups" :["m"]},
 
 		"starttest"       :{"options":["no_method","no_db"],"method":["GET"]},
-		"week4_direct"    :{"method":["GET"]},
-		"week1_binary"    :{"method":["GET"]},
-		"week1_match"     :{"method":["GET"]},
-		"week1_affiliate" :{"method":["GET"]},
-		"run_to_yesterday":{"method":["GET"]},
-		"run_daily"       :{"method":["GET"]},
-		"run_all_tests"   :{"method":["GET"]}
+		"week4_direct"    :{"method":["POST"],"options":["csrf"]},
+		"week1_binary"    :{"method":["POST"],"options":["csrf"]},
+		"week1_match"     :{"method":["POST"],"options":["csrf"]},
+		"week1_affiliate" :{"method":["POST"],"options":["csrf"]},
+		"run_to_yesterday":{"method":["POST"],"options":["csrf"]},
+		"run_daily"       :{"method":["POST"],"options":["csrf"]},
+		"run_all_tests"   :{"method":["POST"],"options":["csrf"]}
 	},
     "fks" : {
         "m" : ["memberid"]
@@ -20,7 +20,6 @@
 
 	"insert_pars"     :["classify","paystatus","memberid","weekid","amount","refid","lev","created"           ],
 	"update_pars"     :["classify","paystatus","memberid","weekid","amount","refid","lev","created","incomeid"],
-	"topics_pars"     :["classify","paystatus","memberid","weekid","amount","refid","lev","created","incomeid"],
 	"edit_pars"       :["classify","paystatus","memberid","weekid","amount","refid","lev","created","incomeid"],
 
     "current_tables" : [

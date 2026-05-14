@@ -3,6 +3,7 @@
 <h4>Direct reward, run monthly</h4>
 <form class="form-inline" name=f1 action="income" method="post">
 <input type=hidden name=c4_id value='0'>
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
   <div class="form-group mb-2">
     <label for="start_monthly">Start:</label>
     <input type="text" class="form-control" name=start_monthly id="start_monthly" placeholder="yyyy-mm-dd">
@@ -17,6 +18,7 @@
 <h4>Binary reward, run weekly</h4>
 <form class="form-inline" name=f2 action="income" method="post">
 <input type=hidden name=c1_id value='0'>
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
   <div class="form-group mb-2">
     <label for="start_daily">Start:</label>
     <input type="text" class="form-control" name=start_daily  id="start_daily" placeholder="yyyy-mm-dd">
@@ -31,6 +33,7 @@
 <h4>Team rewards, run weekly</h4>
 <form class="form-inline" name=f3 action="income" method="post">
 <input type=hidden name=c1_id value='0'>
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
   <div class="form-group mb-2">
     <label for="start_daily">Start:</label>
     <input type="text" class="form-control" name=start_daily id="start_daily" placeholder="yyyy-mm-dd">
@@ -45,6 +48,7 @@
 <h4>Affiliate reward, run weekly</h4>
 <form class="form-inline" name=f3 action="income" method="post">
 <input type=hidden name=c1_id value='0'>
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
   <div class="form-group mb-2">
     <label for="start_daily">Start:</label>
     <input type="text" class="form-control" name=start_daily id="start_daily" placeholder="yyyy-mm-dd">
@@ -64,6 +68,7 @@
 <input type=hidden name=c4_id value='0'>
 <input type=hidden name=isTest value='1'>
 <input type=hidden name=action value='run_all_tests'>
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
   <div class="form-group mb-2">
     <label for="start_monthly">Start Monthly:</label>
     <input type="text" class="form-control" name=start_monthly id="start_monthly" placeholder="yyyy-mm-dd">

@@ -11,7 +11,14 @@ use parent 'MLM::Model';
 my $name = sub {
 	my $item = shift;
 	my $admin = shift;
-    return ($admin) ? "<a href='placement?action=view_binary&memberid=$item->{memberid}'>".$item->{login}." $item->{leg}/$item->{typeid}<br>$item->{milel} - $item->{memberid} - $item->{miler}</a>" : $item->{login};
+  my $self = shift;
+  my $login = $self->html_escape($item->{login});
+  my $leg = $self->html_escape($item->{leg});
+  my $typeid = $self->html_escape($item->{typeid});
+  my $memberid = $self->html_escape($item->{memberid});
+  my $milel = $self->html_escape($item->{milel});
+  my $miler = $self->html_escape($item->{miler});
+  return ($admin) ? "<a href='placement?action=view_binary&amp;memberid=$memberid'>".$login." $leg/$typeid<br>$milel - $memberid - $miler</a>" : $login;
 };
 
 sub view_binary {
@@ -31,7 +38,7 @@ FROM member");
   my $newref = make_parent($ref, $ARGS->{top_memberid});
 
   #$self->{LISTS} = [];
-  my $str = "<ul>\n\t<li>\n\t".$name->($ref->{$ARGS->{memberid}}, $ARGS->{_gadmin})."\n";
+  my $str = "<ul>\n\t<li>\n\t".$name->($ref->{$ARGS->{memberid}}, $ARGS->{_gadmin}, $self)."\n";
   $self->_lower_level($ref, $newref, \$str, 0, $ARGS->{memberid});
   $str .= "\t</li>\n</ul>\n";
 
@@ -55,14 +62,14 @@ sub _lower_level {
 		$$str .= $old . "<ul>\n"
 	}
 	if ($left) {
-		$$str .= $leading . "<li>\n" . $leading. $name->($ref->{$left}, $self->{ARGS}->{_gadmin})."\n";
+		$$str .= $leading . "<li>\n" . $leading. $name->($ref->{$left}, $self->{ARGS}->{_gadmin}, $self)."\n";
 		$self->_lower_level($ref, $newref, $str, $i, $left);
 		$$str .= $leading . "</li>\n"
 	} elsif ($right) {
 		$$str .= $leading . "<li></li>\n";
 	}
 	if ($right) {
-		$$str .= $leading . "<li>\n" . $leading. $name->($ref->{$right}, $self->{ARGS}->{_gadmin})."\n";
+		$$str .= $leading . "<li>\n" . $leading. $name->($ref->{$right}, $self->{ARGS}->{_gadmin}, $self)."\n";
 		$self->_lower_level($ref, $newref, $str, $i, $right);
 		$$str .= $leading . "</li>\n";
 	} elsif ($left) {
@@ -79,6 +86,7 @@ sub leave_tree {
   my $ARGS = $self->{ARGS};
   my $mid = $ARGS->{memberid};
 
+  return $self->run_in_transaction(sub {
   my $err = $self->get_args($ARGS,
 "SELECT top AS membertop
 FROM member
@@ -94,6 +102,9 @@ WHERE f.parent=? AND m.top=?", $mid, $mid, $ARGS->{membertop})
 WHERE memberid=?", $mid)
 	|| $self->do_sql("CALL proc_leave(?)", $mid)
 	|| $self->do_sql(
+"DELETE f FROM family f
+INNER JOIN temp_leave l ON (f.parent=l.parent AND f.child=l.child)")
+	|| $self->do_sql(
 "UPDATE member m
 INNER JOIN temp_leave l ON (m.memberid=l.parent AND m.defpid=l.child)
 SET m.defpid=NULL, m.defleg=NULL");
@@ -105,14 +116,15 @@ SET m.defpid=NULL, m.defleg=NULL");
 INNER JOIN temp_leave_total tmp ON (m.memberid=tmp.parent)
 SET countl=countl-tmp.cleft, milel=milel-tmp.sleft, countr=countr-tmp.cright, miler=miler-tmp.sright")
 	|| $self->do_sql(
-"UPDATE leftright lr
-INNER JOIN temp_leave_level tmp ON (lr.memberid==tmp.parent AND lr.level=tmp.level)
-SET numleft=numleft-tmp.sleft, numright=numright-tmp.sright");
+"UPDATE family_leftright lr
+INNER JOIN temp_leave_level tmp ON (lr.memberid=tmp.parent AND lr.level=tmp.level)
+SET lr.numleft=lr.numleft-tmp.sleft, lr.numright=lr.numright-tmp.sright");
 	} 
 	return $self->do_sql(
 "UPDATE member m
 INNER JOIN temp_leave_total tmp ON (m.memberid=tmp.parent)
 SET countl=countl-tmp.cleft, countr=countr-tmp.cright");
+  });
 }
 
 sub join_tree {
@@ -125,19 +137,20 @@ sub join_tree {
 # 5) call proc_join to make new temp_family table
 # 6) update counts and miles in member
 # 7) insert temp_family to family
-  my $self = shift;
   my $ARGS = $self->{ARGS};
   my $mid = $ARGS->{memberid};
   my $pid = $ARGS->{pid};
   my $leg = $ARGS->{leg};
+  return [1035, 'leg'] unless ($leg && ($leg eq 'L' || $leg eq 'R'));
 
+  return $self->run_in_transaction(sub {
   my $err = $self->get_args($ARGS,
 "SELECT top AS pidtop, leg AS pidleg
 FROM member
 WHERE memberid=?", $pid);
   return $err if $err;
   my $top = $pid;
-  if ($ARGS->{pidleg}==$leg) {
+  if ($ARGS->{pidleg} eq $leg) {
     $top = $ARGS->{pidtop};
 # children have the same top as the member will use pidtop
     $err = $self->do_sql(
@@ -162,19 +175,20 @@ FROM temp_join");
 
   if ($ARGS->{is_add} eq 'Yes') {
 	return $self->do_sql(
-"INSERT INTO leftright (member, level, numleft, numright)
+"INSERT INTO family_leftright (memberid, level, numleft, numright)
 SELECT parent, level, sleft, sright
-FROM temp_family_level tmp
-ON DUPLICATE KEY UPDATE numleft=numleft+tmp.sleft numright=numright+tmp.sright")
+FROM temp_join_level
+ON DUPLICATE KEY UPDATE numleft=numleft+VALUES(numleft), numright=numright+VALUES(numright)")
 	|| $self->do_sql(
 "UPDATE member m
-INNER JOIN temp_family_total tmp ON (m.memberid=tmp.parent)
+INNER JOIN temp_join_total tmp ON (m.memberid=tmp.parent)
 SET m.countl=m.countl+tmp.cleft, m.milel=m.milel+tmp.sleft, m.countr=m.countr+tmp.cright, m.miler=m.miler+tmp.sright");
   }
   return $self->do_sql(
 "UPDATE member m
-INNER JOIN temp_family_total tmp ON (m.memberid=tmp.parent)
+INNER JOIN temp_join_total tmp ON (m.memberid=tmp.parent)
 SET m.countl=m.countl+tmp.cleft, m.countr=m.countr+tmp.cright");
+  });
 }
 
 # ref = {55555=>{pid=>4444,leg=>'L'} is from the member table,

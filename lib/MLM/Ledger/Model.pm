@@ -13,7 +13,7 @@ sub currentBalance {
 
   $self->{LISTS} = [];
   return $self->select_sql($self->{LISTS},
-"SELECT l.weekid, l.memberid, l.ledgerid, format(l.balance,2) as balance, l.shop_balance
+"SELECT l.weekid, l.memberid, l.ledgerid, l.balance, l.shop_balance
 FROM income_ledger l
 INNER JOIN view_balance v USING (ledgerid)
 WHERE l.memberid=?", $extra->{memberid} || $self->{ARGS}->{memberid});

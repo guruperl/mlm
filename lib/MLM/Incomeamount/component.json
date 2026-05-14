@@ -9,7 +9,6 @@
 
 	"insert_pars"     :["bonusType","status","memberid","weekid","amount","created"           ],
 	"update_pars"     :["bonusType","status","memberid","weekid","amount","created","amount_id"],
-	"topics_pars"     :["bonusType","status","memberid","weekid","amount","created","amount_id"],
 	"edit_pars"       :["bonusType","status","memberid","weekid","amount","created","amount_id"],
 
     "current_tables" : [

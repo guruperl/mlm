@@ -4,6 +4,7 @@
 
 <form method=post action=member>
 <input type=hidden name=action value='changedef'>
+[% IF csrf %]<input type=hidden name=csrf value="[% csrf | html %]">[% END %]
 <pre>
 Default Upline of New Member: <input type=text size=5 name=defpid value=[% defpid %]>
 Default Leg of New Member: 

@@ -3,6 +3,7 @@ package MLM::Income::Model;
 use strict;
 use warnings;
 use MLM::Model;
+use MLM::Constants qw(ERR_WRONG_DATE_RANGE);
 our $AUTOLOAD;
 
 use parent 'MLM::Model';
@@ -99,26 +100,35 @@ sub run_cron {
 
   my $err;
   if ($ARGS->{to_run_direct}) {
-    $err = $self->week4_direct() || $self->inserts() || $self->done_week4_direct() || $self->monthly_direct();
+    $err = $self->run_in_transaction(sub {
+      return $self->week4_direct() || $self->inserts() || $self->monthly_direct() || $self->done_week4_direct();
+    });
     return $err if $err;
   }
   if ($ARGS->{to_run_binary}) {
-    $err = $self->week1_binary() || $self->inserts() || $self->done_week1_binary() || $self->weekly_binary();
+    $err = $self->run_in_transaction(sub {
+      return $self->week1_binary() || $self->inserts() || $self->weekly_binary() || $self->done_week1_binary();
+    });
     return $err if $err;
   }
   if ($ARGS->{to_run_match}) {
-    $err = $self->week1_match() || $self->inserts() || $self->done_week1_match() || $self->weekly_match();
+    $err = $self->run_in_transaction(sub {
+      return $self->week1_match() || $self->inserts() || $self->weekly_match() || $self->done_week1_match();
+    });
     return $err if $err;
   }
   if ($ARGS->{to_run_affiliate}) {
-    $err = $self->week1_affiliate() || $self->inserts() || $self->done_week1_affiliate() || $self->weekly_affiliate();
+    $err = $self->run_in_transaction(sub {
+      return $self->week1_affiliate() || $self->inserts() || $self->weekly_affiliate() || $self->done_week1_affiliate();
+    });
     return $err if $err;
   }
 
-  my $test_str = "AND weekid=0" if ($ARGS->{isTest} eq '1');
+  my $test_str = ($ARGS->{isTest} && $ARGS->{isTest} eq '1') ? "AND weekid=0" : "";
   my $rate = $ARGS->{rate_shop};
 
-  return $self->do_sql(
+  return $self->run_in_transaction(sub {
+    return $self->do_sql(
 "INSERT INTO income_ledger (memberid, weekid, amount, balance, shop_balance, old_ledgerid, status, created)
 SELECT tmp.memberid, tmp.weekid, tmp.amount, IFNULL(v.balance,0)+(1-$rate)*tmp.amount, IFNULL(v.shop_balance,0)+$rate*tmp.amount, v.ledgerid, 'Weekly' AS status, NOW()
 FROM (
@@ -134,6 +144,7 @@ LEFT JOIN (
   INNER JOIN view_balance v USING (ledgerid)
 ) v ON (tmp.memberid=v.memberid)") || $self->do_sql(
 "UPDATE income_amount SET status='Done' WHERE status='New' $test_str");
+  });
 }
 
 sub is_week1_affiliate {

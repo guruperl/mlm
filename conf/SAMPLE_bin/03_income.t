@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 
-use lib qw(/SAMPLE_home/mlm/lib /SAMPLE_home/perl);
+use FindBin qw($Bin);
+use lib "$Bin/../../lib", "$Bin/../../../perl";
 use strict;
 use JSON;
 use MLM::Beacon;
-use Test::More tests=>91;
+use Test::More;
 
 my $admin = MLM::Beacon->new(role=>"a");
 my $err = $admin->get_credential("gmarket","gmarketIsCool");
@@ -102,4 +103,5 @@ for my $item (@{$content->{data}}) {
 is($total, 1+2+3+4+5, "total typeid is 15");
 is($num, 2+2+2+2+1, "total num is 9");
 
+done_testing();
 exit;
