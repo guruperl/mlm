@@ -2,9 +2,14 @@
 
 A comprehensive open-source Multi-Level Marketing (MLM) package offering registration, membership management, compensation structures, automated tasks, shopping capabilities, ticketing systems, and backend administration. The package includes four built-in bonus plans: Unilevel, Team, Pairing, and Affiliate. Developers can easily extend these to create custom bonus plans.
 
-The software is built on [Genelet](https://github.com/genelet/perl), an open-source web development framework designed for creating secure, scalable, and high-performance websites.
+The software is built on [Genelet](https://github.com/guruperl/perl), an open-source web development framework designed for creating secure, scalable, and high-performance websites.
 
-> **Note:** The legacy codebase is preserved in the `master` branch.
+Current source repositories:
+
+- Genelet framework: <https://github.com/guruperl/perl.git>
+- MLM application: <https://github.com/guruperl/mlm>
+
+> **Note:** The active development branch is `main`; older historical code may exist on legacy branches.
 
 ## Mobile and API Development
 
@@ -22,7 +27,7 @@ The software is developed in Perl and can operate as a standard CGI-BIN program 
 ### 1.1) Download the Genelet Framework
 
 ```bash
-git clone https://github.com/genelet/perl.git
+git clone https://github.com/guruperl/perl.git
 ```
 
 Assume your current directory is `SAMPLE_home`. After cloning, a new directory named `perl` will be created within `SAMPLE_home`.
@@ -32,7 +37,7 @@ Assume your current directory is `SAMPLE_home`. After cloning, a new directory n
 ### 1.2) Download MLM
 
 ```bash
-git clone https://github.com/genelet/mlm.git
+git clone https://github.com/guruperl/mlm.git
 ```
 
 After cloning, the `mlm` directory will be created with four subdirectories: `lib`, `conf`, `www`, and `views`. The file structure will look like this:
@@ -58,7 +63,7 @@ cd SAMPLE_home/mlm
 make deps
 ```
 
-The target installs the distribution packages for DBI, DBD::mysql, JSON, Template Toolkit, XML::LibXML, CGI, LWP, Digest::HMAC_SHA1, MIME::Lite, and Test::Class. The `cpanfile` is kept as a module manifest for non-Debian systems or custom dependency tooling.
+The target installs the distribution packages for DBI, DBD::mysql, JSON, Template Toolkit, XML::LibXML, CGI, LWP, Digest::HMAC_SHA1, MIME::Lite, Test::Class, and the MySQL command-line client. The `cpanfile` is kept as a module manifest for non-Debian systems or custom dependency tooling.
 
 For a deployed CGI/FastCGI server, add both `SAMPLE_home/perl` and `SAMPLE_home/mlm/lib` to the Perl path:
 
@@ -166,6 +171,8 @@ Load the database schema from `conf/01_init.sql` using a MySQL client tool.
 
 Load `conf/03_setup.sql` to create one compensation plan, one backend admin user, and one member for the initial website launch.
 
+The sample seed data creates an admin login `gmarket` with password `gmarketIsCool`, and a top member login `www` with password `gmarketCool`. Change these credentials before any public deployment.
+
 ### 1.6) Configure config.json and component.json
 
 Copy the sample configuration file:
@@ -227,6 +234,14 @@ cd SAMPLE_home/mlm
 make test
 ```
 
+To run only local compile-free unit tests, use:
+
+```bash
+make unit-test
+```
+
+This target discovers runnable unit tests under `lib/MLM` and intentionally excludes legacy DB fixture scripts with hardcoded historical paths. Database-backed behavioral coverage is provided by `make test` and `make test-external`.
+
 With your own MySQL, use:
 
 ```bash
@@ -250,11 +265,26 @@ Follow the instructions in `conf/07_read.me` to build the week tables (`cron_1we
 perl conf/08_weekly.pl -h
 ```
 
-Follow the on-screen instructions to proceed.
+For example, from the `mlm` directory:
+
+```bash
+perl conf/08_weekly.pl -c conf/config.json 2026-01-05 1 250
+```
+
+Use the first compensation week start date for your business instead of `2026-01-05`.
 
 ### 1.9) Set Up Cronjob
 
 Configure `bin/run_daily.pl` to run as a daily cronjob (e.g., at 2 AM):
+
+If you have not created a deployment `bin` directory, copy the sample first and replace `SAMPLE_home` with your installation path:
+
+```bash
+mkdir -p bin
+cp conf/SAMPLE_bin/run_daily.pl bin/run_daily.pl
+```
+
+Edit `bin/run_daily.pl` if you changed the seeded admin username or password.
 
 ```bash
 crontab -e
@@ -264,7 +294,7 @@ crontab -e
 
 ### 1.10) Launch the Website
 
-Ensure the web server, configuration file, week tables, and cronjob are all properly configured. The entry point URLs are:
+Copy `conf/SAMPLE_cgi-bin/goto` to your web server's CGI-BIN directory, replace `SAMPLE_home` with your installation path, and make it executable. Then ensure the web server, `conf/config.json`, week tables, and cronjob are all properly configured. The entry point URLs are:
 
 | Portal | URL |
 |--------|-----|
@@ -278,7 +308,7 @@ For most systems, running MLM as a CGI program is fast and secure. However, for 
 
 To configure FastCGI:
 
-1. Copy `goto` to `/SAMPLE_home/mlm/www` and configure Apache to run it as an FCGID handler
+1. Copy `conf/SAMPLE_cgi-bin/goto` to `/SAMPLE_home/mlm/www/goto` and configure Apache to run it as an FCGID handler
 2. Update `Script` in `config.json` from `/cgi-bin/goto` to `/goto`
 3. Add `1` as the fourth argument in `Genelet::Dispatch::run`:
 
@@ -293,6 +323,8 @@ Genelet::Dispatch::run(
   1
 );
 ```
+
+FastCGI deployments also need `CGI::Fast` installed, for example `sudo apt-get install libcgi-fast-perl` on Ubuntu/Debian.
 
 ---
 
@@ -619,7 +651,7 @@ Dynamic HTML pages use Perl's Template Toolkit with [Bootstrap](https://getboots
 2. Update `Template` in `config.json` to point to it
 3. Copy the existing structure:
    ```bash
-   (cd SAMPLE_home/views; tar cvf - *) | (cd NEW_view_directory; tar xvf -)
+   (cd SAMPLE_home/mlm/views; tar cvf - *) | (cd NEW_view_directory; tar xvf -)
    ```
 4. Modify templates as needed
 
